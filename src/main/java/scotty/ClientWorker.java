@@ -45,34 +45,13 @@ public class ClientWorker implements HttpHandler {
 			} else {
 				log.log(Level.INFO, "http connection..");
 			}
-			// sign request
+			// sign request -> in Transporter
 
-			// encrypt request
+			// encrypt request -> in Transporter
 
 			try {
 				Response response = transporter.sendAndReceive(request);
-
-				// Set headers
-				for (Entry<String, List<String>> entry : response.getHeaders()) {
-					for (String val : entry.getValue()) {
-						e.getResponseHeaders().add(entry.getKey(), val);
-					}
-				}
-
-				// Set responsecode, and length of responsebody TODO check if 0
-				// - always chunked encoding, is ok
-				long bodyLength = 0;
-				if (response.getBody() == null
-						|| response.getBody().length() == 0) {
-					bodyLength = -1;
-				}
-
-				e.sendResponseHeaders(response.getCode(), bodyLength);
-
-				// Set body
-				if (bodyLength >= 0) {
-					e.getResponseBody().write(response.getBody().getBytes());
-				}
+				setResponse(e, response);
 			} catch (Exception ex) {
 				System.err.println("can't send http request to gateway: ");
 				ex.printStackTrace();
@@ -82,6 +61,41 @@ public class ClientWorker implements HttpHandler {
 			e.getRequestBody().close();
 			e.close();
 		}
+	}
+
+	/**
+	 * Sets the response in the output to the client.
+	 * 
+	 * @param e
+	 *            exchange-
+	 * @param response
+	 *            response to set
+	 * @throws Exception
+	 *             excp.
+	 */
+	public void setResponse(HttpExchange e, Response response) throws Exception {
+
+		// Set headers
+		for (Entry<String, List<String>> entry : response.getHeaders()) {
+			for (String val : entry.getValue()) {
+				e.getResponseHeaders().add(entry.getKey(), val);
+			}
+		}
+
+		// Set responsecode, and length of responsebody TODO check if 0
+		// - always chunked encoding, is ok
+		long bodyLength = 0;
+		if (response.getBody() == null || response.getBody().length() == 0) {
+			bodyLength = -1;
+		}
+
+		e.sendResponseHeaders(response.getCode(), bodyLength);
+
+		// Set body
+		if (bodyLength >= 0) {
+			e.getResponseBody().write(response.getBody().getBytes());
+		}
+
 	}
 
 	/**
