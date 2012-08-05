@@ -17,6 +17,11 @@ import java.util.Set;
 public class Request {
 
 	/**
+	 * Indicate https request.
+	 */
+	private boolean secure;
+
+	/**
 	 * HTTP Method.
 	 */
 	private String method;
@@ -66,5 +71,13 @@ public class Request {
 
 	public void setBody(String body) {
 		this.body = body;
+	}
+
+	public boolean isSecure() {
+		return secure;
+	}
+
+	public void setSecure(boolean secure) {
+		this.secure = secure;
 	}
 }

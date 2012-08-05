@@ -6,15 +6,18 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.logging.Level;
 
 import scotty.model.Request;
 import scotty.model.Response;
 import scotty.transporter.GatewayTransporter;
 import scotty.transporter.impl.DefaultGatewayTransporter;
 
+import com.sun.istack.internal.logging.Logger;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpsExchange;
 
 /**
  * Worker class handels clients http request. Signs and encrypts the request and
@@ -24,6 +27,7 @@ import com.sun.net.httpserver.HttpHandler;
  *         copyright (C) 2012, http://www.aditu.de, tobias.zeising@aditu.de
  */
 public class ClientWorker implements HttpHandler {
+	private Logger log = Logger.getLogger(ClientWorker.class);
 
 	/**
 	 * Communicator to/from the Gateway.
@@ -32,9 +36,15 @@ public class ClientWorker implements HttpHandler {
 
 	@Override
 	public void handle(HttpExchange e) throws IOException {
+		log.log(Level.INFO, "New connection..");
 		try {
 			Request request = createRequest(e);
-
+			if (e instanceof HttpsExchange) {
+				request.setSecure(true);
+				log.log(Level.INFO, "https connection..");
+			} else {
+				log.log(Level.INFO, "http connection..");
+			}
 			// sign request
 
 			// encrypt request
@@ -64,8 +74,8 @@ public class ClientWorker implements HttpHandler {
 					e.getResponseBody().write(response.getBody().getBytes());
 				}
 			} catch (Exception ex) {
-				System.err.println("can't send http request to gateway: "
-						+ ex.getMessage());
+				System.err.println("can't send http request to gateway: ");
+				ex.printStackTrace();
 			}
 		} finally {
 			e.getResponseBody().close();
