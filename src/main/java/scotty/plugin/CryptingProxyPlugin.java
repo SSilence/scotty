@@ -54,6 +54,8 @@ public class CryptingProxyPlugin extends ProxyPlugin {
 					.transformRequest(request);
 
 			if (Scotty.useGateway) {
+				// Build request, which will be sent to the gateway:
+
 				request = new Request();
 				request.setContent(cryptedRequest);
 				request.setMethod("POST");
@@ -65,7 +67,7 @@ public class CryptingProxyPlugin extends ProxyPlugin {
 			if (Scotty.useGateway) {
 				response = responseTransformer
 						.transformResponse(cryptedResponse.getContent());
-			}else {
+			} else {
 				response = cryptedResponse;
 			}
 
