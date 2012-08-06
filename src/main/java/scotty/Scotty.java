@@ -1,17 +1,22 @@
 package scotty;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.File;
 import java.util.Properties;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
+import javax.swing.JFrame;
+
+import org.mortbay.jetty.Server;
+import org.mortbay.log.Log;
+import org.owasp.webscarab.model.Preferences;
+import org.owasp.webscarab.plugin.CredentialManager;
+import org.owasp.webscarab.plugin.Framework;
+import org.owasp.webscarab.plugin.proxy.ListenerSpec;
+import org.owasp.webscarab.plugin.proxy.Proxy;
+import org.owasp.webscarab.ui.swing.CredentialManagerFrame;
+import org.owasp.webscarab.ui.swing.CredentialRequestDialog;
+
+import scotty.plugin.CryptingProxyPlugin;
+import scotty.plugin.LoggingProxyPlugin;
 
 /**
  * Scotty main command line class.
@@ -22,91 +27,81 @@ import org.apache.commons.cli.PosixParser;
 public class Scotty {
 	public static Properties properties;
 
+	private CredentialManagerFrame _credentialManagerFrame = null;
+	private CredentialRequestDialog _credentialRequestDialog = null;
+	private JFrame frame = new JFrame();
+
+	public static String gatewayUrl = "http://localhost:9090/request";
+
+	// Use gateway - if false, scotty acts transparent as proxy.
+	public static boolean useGateway = false;
+
+	public void init() throws Exception {
+		Preferences.setPreference("WebScarab.promptForCredentials", "true");
+
+		Framework framework = new Framework();
+
+		setProxySettings();
+
+		// FIXME conversations werden hier auf dem Filesystem gespeichert.
+		// Sollten wenn dann auch verschluesselt werden.
+		framework.setSession("FileSystem",
+				new File(System.getProperty("java.io.tmpdir") + "/scotty"), "");
+		CredentialManager cm = framework.getCredentialManager();
+		_credentialManagerFrame = new CredentialManagerFrame(cm);
+		_credentialRequestDialog = new CredentialRequestDialog(frame, true, cm);
+		cm.setUI(_credentialRequestDialog);
+
+		loadLitePlugins(framework);
+
+		Thread.currentThread().join();
+	}
+
+	/**
+	 * Configures the Proxy Settings.
+	 */
+	public void setProxySettings() {
+		// TODO todo.
+		// HTTPClientFactory _Factory = HTTPClientFactory.getInstance()
+		// _factory.setHttpProxy(httpserver, httpport);
+		// _factory.setHttpsProxy(httpsserver, httpsport);
+		// _factory.setNoProxy(noproxies);
+		//
+		// Preferences.setPreference("WebScarab.httpProxy", httpserver + ":"
+		// + httpport);
+		// Preferences.setPreference("WebScarab.httpsProxy", httpsserver + ":"
+		// + httpsport);
+		// Preferences.setPreference("WebScarab.noProxy",
+		// noProxyTextArea.getText());
+		//
+
+	}
+
+	public void loadLitePlugins(Framework framework) {
+		Log.debug("Loading Plugin ...");
+		Proxy proxy = new Proxy(framework);
+		framework.addPlugin(proxy);
+
+		CryptingProxyPlugin cp = new CryptingProxyPlugin();
+		proxy.addPlugin(cp);
+
+		LoggingProxyPlugin me = new LoggingProxyPlugin();
+		proxy.addPlugin(me);
+
+		for (ListenerSpec spec : proxy.getProxies()) {
+			proxy.addListener(spec);
+		}
+	}
+
 	public static void main(String[] args) throws Exception {
-
-		// parse command line parameters
-		Options options = getOptions();
-		CommandLineParser parser = new PosixParser();
-		CommandLine cmd = parser.parse(options, args);
-
-		// load default properties
-		properties = loadDefaultProperties();
-
-		// load optional config file
-		try {
-			String filename = "";
-			if (cmd.hasOption("config")) {
-				filename = cmd.getOptionValue("config");
-				Properties configFileProperties = loadProperties(filename);
-				properties.putAll(configFileProperties);
-			}
-		} catch (IOException e) {
-			System.err.println("can't load given config file: " +  e.getMessage());
+		if (useGateway) {
+			// Dummy Gateway, echoes only request.
+			Server server = new Server(9090);
+			server.setHandler(new DummyGatewayLoggerServer());
+			server.start();
 		}
 
-		// start as proxy
-		if (cmd.hasOption("proxy")) {
-			int port = Integer.parseInt(properties.getProperty("clientProxyPort"));
-			ClientServer clientServer = new ClientServer(port);
-			clientServer.startClientServer();
-		
-		// start as gateway
-		} else if (cmd.hasOption("gateway")) {
-			int port = Integer.parseInt(properties.getProperty("gatewayPort"));
-			GatewayServer gatewayServer = new GatewayServer(port);
-			gatewayServer.startGatewayServer();
-			
-		} else {
-			HelpFormatter formatter = new HelpFormatter();
-			formatter.printHelp("scotty", options);
-		}
-	}
-
-	/**
-	 * Create command line options.
-	 * 
-	 * @return command line options
-	 */
-	private static Options getOptions() {
-		Options options = new Options();
-		options.addOption("proxy", false, "start as client proxy");
-		options.addOption("gateway", false, "start as gateway server");
-
-		Option configfile = OptionBuilder.withArgName("config").hasArg()
-				.withDescription("configfile path and name").create("config");
-		options.addOption(configfile);
-
-		return options;
-	}
-
-	/**
-	 * Load default properties.
-	 * 
-	 * @return default properties
-	 * @throws IOException
-	 */
-	private static Properties loadDefaultProperties() throws IOException {
-		return loadProperties(null);
-	}
-
-	/**
-	 * Load properties.
-	 * 
-	 * @return default properties
-	 * @throws IOException
-	 */
-	private static Properties loadProperties(String filename)
-			throws IOException {
-		InputStream is = null;
-		if (filename == null || filename.equals("")) {
-			is = ClassLoader.getSystemClassLoader().getResourceAsStream(
-					"config.properties");
-		} else {
-			is = new FileInputStream(filename);
-		}
-		Properties props = new Properties();
-		props.load(is);
-		is.close();
-		return props;
+		Scotty scotty = new Scotty();
+		scotty.init();
 	}
 }

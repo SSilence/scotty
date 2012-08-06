@@ -10,9 +10,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.mortbay.jetty.Server;
+import org.mortbay.jetty.handler.AbstractHandler;
 
 /**
  * Gateway
@@ -28,35 +27,36 @@ public class GatewayServer extends AbstractHandler {
 		this.port = port;
 	}
 
-	public void handle(String target, Request baseRequest,
-			HttpServletRequest request, HttpServletResponse response)
-			throws IOException, ServletException {
+	@Override
+	public void handle(String arg0, HttpServletRequest arg1,
+			HttpServletResponse arg2, int arg3) throws IOException,
+			ServletException {
 
-		// get clients original http request
-		String clientsRequest = baseRequest.getParameter("value");
-		if (clientsRequest == null || clientsRequest.length() == 0) {
-			return;
-		}
-
-		// decrypt request
-
-		// check sign
-
-		// get http request for client
-		String forClientResponse = sendHttpRequest(clientsRequest);
-
-		// sign response
-
-		// encrypt response
-
-		// send response to client
-		OutputStreamWriter outputStreamWriter = new OutputStreamWriter(
-				response.getOutputStream());
-		outputStreamWriter.write(forClientResponse);
-		outputStreamWriter.flush();
-
-		response.setStatus(HttpServletResponse.SC_OK);
-		baseRequest.setHandled(true);
+//		// get clients original http request
+//		String clientsRequest = arg1.getParameter("value");
+//		if (clientsRequest == null || clientsRequest.length() == 0) {
+//			return;
+//		}
+//
+//		// decrypt request
+//
+//		// check sign
+//
+//		// get http request for client
+//		String forClientResponse = sendHttpRequest(clientsRequest);
+//
+//		// sign response
+//
+//		// encrypt response
+//
+//		// send response to client
+//		OutputStreamWriter outputStreamWriter = new OutputStreamWriter(
+//				response.getOutputStream());
+//		outputStreamWriter.write(forClientResponse);
+//		outputStreamWriter.flush();
+//
+//		response.setStatus(HttpServletResponse.SC_OK);
+//		baseRequest.setHandled(true);
 	}
 
 	/**
