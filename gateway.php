@@ -33,7 +33,7 @@ function http_parse_headers($header) {
 
 // read request
 if(!isset($_REQUEST["value"]) || strlen(trmi($_REQUEST["value"]))==0)
-	die("no value given");
+    die("no value given");
 $request = $_REQUEST["value"];
 
 
@@ -51,24 +51,24 @@ $port = 80;
 $headers = http_parse_headers($request);
 foreach($headers as $key => $value) {
     // get host and port from headers
-	if(strtolower($key)=="host") {
-		$hostParts = preg_split("/:/", $value);
-		$host = $hostParts[0];
-		if(count($hostParts)>1) {
-			$port = $hostParts[1];
-		}
-	}
+    if(strtolower($key)=="host") {
+        $hostParts = preg_split("/:/", $value);
+        $host = $hostParts[0];
+        if(count($hostParts)>1) {
+            $port = $hostParts[1];
+        }
+    }
 }
 if(strlen(trim($host))==0)
-	die("no host found");
+    die("no host found");
 
 // add connection close for preventing endless blocking on fread
 $headers["Connection"] = "close";
 
 // proxy set? use it.
 if(strlen($proxyName)!=0) {
-	$host = $proxyName;
-	$port = $proxyPort;
+    $host = $proxyName;
+    $port = $proxyPort;
     
     // use proxy authentication
     if(strlen(trim($proxyUser))!=0)
@@ -85,20 +85,20 @@ foreach($headers as $key => $value) {
 $requestParts = preg_split("/\r\n\r\n/", $request);
 $body = "";
 if(count($requestParts)>1)
-	$body = $requestParts[1];
+    $body = $requestParts[1];
 
 // send http request
 $timeout = 20;
 $connection = fsockopen($host, $port, $errno, $errstr, $timeout);
 if(!$connection)
-	die("Connection Error: " . $errstr);
+    die("Connection Error: " . $errstr);
 
 $request = $header."\r\n".$body."\r\n\r\n";
 fputs($connection, $request);
 
 $response = '';
 while(!feof($connection))
-	$response .= fread($connection, 128);
+    $response .= fread($connection, 128);
 fclose($connection);
 
 // sign
