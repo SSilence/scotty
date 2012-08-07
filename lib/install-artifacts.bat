@@ -1,0 +1,1 @@
+mvn install:install-file -Dfile=proxy-vole_20120727.jar -DgroupId=proxyvole -DartifactId=proxyvole -Dversion=1 -Dpackaging=jar

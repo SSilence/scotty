@@ -4,8 +4,14 @@
 	<groupId>scotty</groupId>
 	<artifactId>scotty</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>soctty transporter</name>
+	<name>scotty transporter</name>
 	<dependencies>
+
+		<dependency>
+			<groupId>proxyvole</groupId>
+			<artifactId>proxyvole</artifactId>
+			<version>1.0</version>
+		</dependency>
 		<dependency>
 			<groupId>org.htmlparser</groupId>
 			<artifactId>htmlparser</artifactId>
