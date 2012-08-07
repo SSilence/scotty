@@ -7,7 +7,6 @@
  *         copyright (C) 2012, http://www.aditu.de, tobias.zeising@aditu.de
  */
 
-
 // optional proxy config
 $proxyName = ''; // e.g. 'tcp://myproxy.de';
 $proxyPort = 8080;
@@ -31,14 +30,10 @@ function http_parse_headers($header) {
     return $retVal;
 }
 
-// read request
-if(!isset($_REQUEST["value"]) || strlen(trmi($_REQUEST["value"]))==0)
+// read post data
+$request = file_get_contents('php://input');
+if(strlen(trim($request))==0)
     die("no value given");
-$request = $_REQUEST["value"];
-
-
-//Test Request
-//$request = "GET www.google.de HTTP/1.1\r\nHost: www.google.de\r\nConnection: close\r\n\r\nklasdjsdfjkl\r\n\r\n";
 
 // decrypt request
 
@@ -91,14 +86,15 @@ if(count($requestParts)>1)
 $timeout = 20;
 $connection = fsockopen($host, $port, $errno, $errstr, $timeout);
 if(!$connection)
-    die("Connection Error: " . $errstr);
+    die("Connection Error");
 
 $request = $header."\r\n".$body."\r\n\r\n";
 fputs($connection, $request);
 
 $response = '';
-while(!feof($connection))
+while(!feof($connection)) {
     $response .= fread($connection, 128);
+}
 fclose($connection);
 
 // sign
@@ -106,4 +102,5 @@ fclose($connection);
 // encrypt
 
 // send response
-echo $response;
+header("Content-Length: " . strlen($response));
+die($response);
