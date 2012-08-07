@@ -69,7 +69,11 @@ public class CryptingProxyPlugin extends ProxyPlugin {
 				request.setContent(cryptedRequest);
 				request.setHeader("Content-Length", Integer.toString(cryptedRequest.length));
 				request.setMethod("POST");
-				request.setURL(new HttpUrl(Scotty.gatewayUrl));
+				if ("https".equalsIgnoreCase(request.getURL().getScheme())) {
+					request.setURL(new HttpUrl(Scotty.gatewayUrl + "?ssl=true"));
+				} else {
+					request.setURL(new HttpUrl(Scotty.gatewayUrl));
+				}
 			}
 
 			Response cryptedResponse = in.fetchResponse(request);
