@@ -1,10 +1,12 @@
 package scotty.transformer.impl;
 
-import java.text.ParseException;
+import java.io.ByteArrayInputStream;
 
 import org.owasp.webscarab.model.Response;
 
 import scotty.transformer.ResponseTransformer;
+
+
 
 public class DefaultResponseTransformer implements ResponseTransformer {
 
@@ -14,9 +16,8 @@ public class DefaultResponseTransformer implements ResponseTransformer {
 		Response r = new Response();
 
 		try {
-			String s = new String(response);
-			r.parse(s);
-		} catch (ParseException e) {
+			r.read(new ByteArrayInputStream(response));
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
