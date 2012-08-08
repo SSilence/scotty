@@ -1,6 +1,9 @@
 package scotty;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.net.Proxy.Type;
 import java.net.ProxySelector;
@@ -24,6 +27,8 @@ import org.owasp.webscarab.plugin.proxy.ListenerSpec;
 import org.owasp.webscarab.plugin.proxy.Proxy;
 import org.owasp.webscarab.ui.swing.CredentialRequestDialog;
 
+import scotty.crypto.CryptoException;
+import scotty.crypto.KeyManager;
 import scotty.plugin.CryptingProxyPlugin;
 
 import com.btr.proxy.search.ProxySearch;
@@ -50,12 +55,17 @@ public class Scotty {
 	/**
 	 * CLI to specify gateway.
 	 */
-	private String GATEWAY_CMDLINE_PARAM = "g";
+	private static final String GATEWAY_CMDLINE_PARAM = "g";
 
 	/**
 	 * CLI to specify the local port
 	 */
-	private String LOCALPORT_CMDLINE_PARAM = "p";
+	private static final String LOCALPORT_CMDLINE_PARAM = "p";
+
+	/**
+	 * CLI for creating a new key pair
+	 */
+	private static final String CREATEKEY_CMDLINE_PARAM = "c";
 
 	/**
 	 * Default gateway url, if none is specified.
@@ -92,9 +102,55 @@ public class Scotty {
 	 */
 	public static void main(String[] args) throws Exception {
 		Scotty scotty = new Scotty();
-		scotty.handleCommandline(args);
+		CommandLine commandLine = scotty.handleCommandline(args);
 
-		scotty.init();
+		// generate keys
+		if (commandLine.hasOption(CREATEKEY_CMDLINE_PARAM)) {
+			generateKeyPair();
+
+			// start scotty
+		} else {
+			scotty.init();
+		}
+
+	}
+
+	private static void generateKeyPair() throws IOException, Exception,
+			CryptoException {
+		BufferedReader commandLineInput = new BufferedReader(
+				new InputStreamReader(System.in));
+		System.out.println("filename of private key: ");
+		String privateKeyFile = commandLineInput.readLine();
+
+		System.out.println("filename of public key: ");
+		String publicKeyFile = commandLineInput.readLine();
+
+		System.out.println("password for private key: ");
+		String privateKeyPassword = commandLineInput.readLine();
+
+		KeyManager keyManager = new KeyManager();
+		keyManager.generateKeyPair();
+		System.out.println("key pair successfully generated");
+
+		keyManager.writePrivateKey(privateKeyFile, privateKeyPassword);
+		System.out.println("private key successfully saved");
+
+		keyManager.writePublicKey(publicKeyFile);
+		System.out.println("public key successfully saved");
+
+		// check parsing files
+		KeyManager checkKeyManager = new KeyManager();
+		checkKeyManager.readPrivateKey(privateKeyFile, privateKeyPassword);
+		if (checkKeyManager.getPrivateKey() != null)
+			System.out.println("private key successfully read");
+		else
+			System.err.println("can't read generated private key file");
+
+		checkKeyManager.readPublicKey(publicKeyFile);
+		if (checkKeyManager.getPublicKey() != null)
+			System.out.println("public key successfully read");
+		else
+			System.err.println("can't read generated public key file");
 	}
 
 	/**
@@ -105,11 +161,12 @@ public class Scotty {
 	 * @throws Exception
 	 *             exc.
 	 */
-	private void handleCommandline(String[] args) throws Exception {
+	private CommandLine handleCommandline(String[] args) throws Exception {
 		Options opts = new Options();
 		opts.addOption(GATEWAY_CMDLINE_PARAM, true, "URL of the Gateway");
 		opts.addOption(LOCALPORT_CMDLINE_PARAM, true,
 				"Local port, where scotty listens for requests");
+		opts.addOption(CREATEKEY_CMDLINE_PARAM, false, "Create new KeyPair");
 
 		CommandLineParser cmd = new PosixParser();
 		CommandLine line = cmd.parse(opts, args);
@@ -121,6 +178,8 @@ public class Scotty {
 				defaultLocalPort);
 		Preferences.setPreference("Proxy.listeners", localAddr + ":"
 				+ localPort);
+
+		return line;
 	}
 
 	public void init() throws Exception {
