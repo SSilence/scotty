@@ -64,14 +64,14 @@ public class CryptingProxyPlugin extends ProxyPlugin {
 
 				HttpUrl gateway = new HttpUrl(Scotty.gatewayUrl);
 				request.setHeader("Host", gateway.getHost());
-				request.setHeader("Content-Length",
-						Integer.toString(cryptedRequest.length));
-				request.setHeader("User-Agent", uaProvider.getUserAgent());
 				request.setHeader("Accept-Charset",
 						"ISO-8859-1,utf-8;q=0.7,*;q=0.3");
 				request.setHeader("Accept-Encoding", "deflate");
 				request.setHeader("Accept-Language",
 						"de-DE,de;q=0.8,en-US;q=0.6,en;q=0.4");
+				request.setHeader("Content-Length",
+						Integer.toString(cryptedRequest.length));
+				request.setHeader("User-Agent", uaProvider.getUserAgent());
 
 				request.setMethod("POST");
 

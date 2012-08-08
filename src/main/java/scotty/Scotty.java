@@ -198,7 +198,7 @@ public class Scotty {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			JOptionPane.showConfirmDialog(parent,
+			JOptionPane.showMessageDialog(parent,
 					"Proxy could not be set! Try it manually",
 					"Proxy not resolved", JOptionPane.WARNING_MESSAGE);
 
