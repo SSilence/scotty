@@ -1,6 +1,5 @@
 package scotty;
 
-import java.io.File;
 import java.net.InetSocketAddress;
 import java.net.Proxy.Type;
 import java.net.ProxySelector;
@@ -124,18 +123,13 @@ public class Scotty {
 	}
 
 	public void init() throws Exception {
-		Preferences.setPreference("WebScarab.promptForCredentials", "true");
-
-		Framework framework = new Framework();
-
 		configureProxySettings();
 
-		// FIXME conversations werden hier auf dem Filesystem gespeichert.
-		// Sollten wenn dann auch verschluesselt werden.
-		framework.setSession("FileSystem",
-				new File(System.getProperty("java.io.tmpdir") + "/scotty"), "");
-		CredentialManager cm = framework.getCredentialManager();
+		Framework framework = new Framework();
+		framework.setSession(null, null, null);
 
+		Preferences.setPreference("WebScarab.promptForCredentials", "true");
+		CredentialManager cm = framework.getCredentialManager();
 		CredentialManagerUI credentialRequestDialog = new CredentialRequestDialog(
 				parent, true, cm);
 		cm.setUI(credentialRequestDialog);
