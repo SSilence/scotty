@@ -70,6 +70,13 @@
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<mainClass>scotty.Scotty</mainClass>
+							<packageName>scotty</packageName>
+						</manifest>
+					</archive>
 				</configuration>
 				<executions>
 					<execution>
