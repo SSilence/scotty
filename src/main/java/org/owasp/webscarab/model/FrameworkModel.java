@@ -95,20 +95,9 @@ public class FrameworkModel {
 			throws StoreException {
 		try {
 			_rwl.writeLock().acquire();
-			if (type.equals("FileSystem") && store instanceof File) {
-				try {
-					// _store = new FileSystemStore((File) store);
-					// NopFileSystemStore stores nothing.
-					_store = new NopStore();
-				} catch (Exception e) {
-					throw new StoreException("Error initialising session : "
-							+ e.getMessage());
-				}
-			} else {
-				_rwl.writeLock().release();
-				throw new StoreException("Unknown store type " + type
-						+ " and store " + store);
-			}
+
+			_store = new NopStore();
+
 			_rwl.readLock().acquire(); // downgrade
 			_rwl.writeLock().release();
 			_urlModel.fireUrlsChanged();
