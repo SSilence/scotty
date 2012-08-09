@@ -64,6 +64,11 @@ if(strlen(trim($request))==0)
     die("no value given");
 
 // decrypt request
+/*
+$rsa = new Crypt_RSA();
+$rsa->loadKey(file_get_contents('private'));
+file_put_contents("c:\\tmp\\test.txt", $rsa->decrypt($request));
+*/
 
 // check sign of the request
 

@@ -21,20 +21,27 @@ public class DefaultRequestTransformer implements RequestTransformer {
 	public byte[] transformRequest(Request request) {
 
 		return request.toString().getBytes();
+		
 		/*
-		 * // generate AES key String randomAesPassword =
-		 * generateRandomString(16); System.out.println("AES Password: " +
-		 * randomAesPassword); // encrypt AES key with RSA byte[]
-		 * encryptedRandomAesPassword = null; try { // ToDo: use gateways public
-		 * key not clients encryptedRandomAesPassword =
-		 * RSAEncryption.encrypt(randomAesPassword.getBytes(),
-		 * keyManager.getPublicKey()); } catch (CryptoException e) {
-		 * e.printStackTrace(); }
-		 * 
-		 * return encryptedRandomAesPassword;
-		 */
-		// byte[] plainRequest = request.toString().getBytes();
+		// generate AES key
+		String randomAesPassword = generateRandomString(16);
 
+		System.out.println("AES Password: " + randomAesPassword);
+
+		// encrypt AES key with RSA
+		byte[] encryptedRandomAesPassword = null;
+		try { 
+			// ToDo: use gateways public key not clients
+			encryptedRandomAesPassword = RSAEncryption.encrypt(
+					randomAesPassword.getBytes(), keyManager.getPublicKey());
+		} catch (CryptoException e) {
+			e.printStackTrace();
+		}
+
+		return encryptedRandomAesPassword;
+
+		// byte[] plainRequest = request.toString().getBytes();
+		*/
 	}
 
 	/**
