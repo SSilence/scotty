@@ -51,7 +51,7 @@ public class AESEncryption {
 	private static byte[] deAndEncrypt(byte[] content, String password,
 			boolean decrypt) throws CryptoException {
 		try {
-			// hash password for correct password length of 256 bit
+			// hash password for correct password length of 128 bit
 			MessageDigest md = MessageDigest.getInstance("SHA-256");
 			md.update(password.getBytes());
 			byte[] hashedPassword = md.digest();
