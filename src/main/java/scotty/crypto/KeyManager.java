@@ -72,9 +72,12 @@ public class KeyManager {
 			throw new CryptoException("no private key set");
 		}
 
-		byte[] encryptedPrivateKey = AESEncryption.encrypt(
-				privateKey.getEncoded(), password);
-		writeKey(filename, encryptedPrivateKey);
+		byte[] privateKeyAsByteArray = privateKey.getEncoded();
+		if (password != null && password.length() != 0)
+			privateKeyAsByteArray = AESEncryption.encrypt(
+					privateKey.getEncoded(), password);
+
+		writeKey(filename, privateKeyAsByteArray);
 	}
 
 	/**
@@ -121,10 +124,11 @@ public class KeyManager {
 	public void readPrivateKey(String filename, String password)
 			throws CryptoException {
 		try {
-			byte[] privateKeyEncrypted = readFile(filename);
-			byte[] privateKeyDecrypted = AESEncryption.decrypt(
-					privateKeyEncrypted, password);
-			this.privateKey = parsePrivateKeyFromByteArray(privateKeyDecrypted);
+			byte[] privateKeyFromFile = readFile(filename);
+			if (password != null && password.length() != 0)
+				privateKeyFromFile = AESEncryption.decrypt(privateKeyFromFile,
+						password);
+			this.privateKey = parsePrivateKeyFromByteArray(privateKeyFromFile);
 		} catch (Exception e) {
 			throw new CryptoException("Error, can't read private key: "
 					+ e.getMessage());

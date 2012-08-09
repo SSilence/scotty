@@ -1,6 +1,7 @@
 package scotty;
 
 import java.io.BufferedReader;
+import java.io.Console;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
@@ -67,6 +68,21 @@ public class Scotty {
 	private static final String CREATEKEY_CMDLINE_PARAM = "c";
 
 	/**
+	 * CLI for private key
+	 */
+	private static final String PRIVATEKEY_CMDLINE_PARAM = "privatekey";
+
+	/**
+	 * CLI for public key
+	 */
+	private static final String PUBLICKEY_CMDLINE_PARAM = "publickey";
+
+	/**
+	 * Key Manager for RSA Key Access
+	 */
+	private static KeyManager keyManager;
+
+	/**
 	 * Default gateway url, if none is specified.
 	 */
 	private String defaultGatewayUrl = "http://localhost";
@@ -109,6 +125,11 @@ public class Scotty {
 
 			// start scotty
 		} else {
+
+			// load keys
+			loadKeys(commandLine);
+
+			// start server
 			scotty.init();
 		}
 
@@ -118,14 +139,14 @@ public class Scotty {
 			CryptoException {
 		BufferedReader commandLineInput = new BufferedReader(
 				new InputStreamReader(System.in));
-		System.out.println("filename of private key: ");
+		System.out.print("filename of private key: ");
 		String privateKeyFile = commandLineInput.readLine();
 
-		System.out.println("filename of public key: ");
+		System.out.print("filename of public key: ");
 		String publicKeyFile = commandLineInput.readLine();
 
-		System.out.println("password for private key: ");
-		String privateKeyPassword = commandLineInput.readLine();
+		System.out.print("password for private key: ");
+		String privateKeyPassword = new String(System.console().readPassword());
 
 		KeyManager keyManager = new KeyManager();
 		keyManager.generateKeyPair();
@@ -166,6 +187,8 @@ public class Scotty {
 		opts.addOption(LOCALPORT_CMDLINE_PARAM, true,
 				"Local port, where scotty listens for requests");
 		opts.addOption(CREATEKEY_CMDLINE_PARAM, false, "Create new KeyPair");
+		opts.addOption(PRIVATEKEY_CMDLINE_PARAM, true, "public key");
+		opts.addOption(PUBLICKEY_CMDLINE_PARAM, true, "private key");
 
 		CommandLineParser cmd = new PosixParser();
 		CommandLine line = cmd.parse(opts, args);
@@ -209,12 +232,35 @@ public class Scotty {
 		Proxy proxy = new Proxy(framework);
 		framework.addPlugin(proxy);
 
-		CryptingProxyPlugin cp = new CryptingProxyPlugin();
+		CryptingProxyPlugin cp = new CryptingProxyPlugin(keyManager);
 		proxy.addPlugin(cp);
 
 		for (ListenerSpec spec : proxy.getProxies()) {
 			proxy.addListener(spec);
 		}
+	}
+
+	/**
+	 * Load Keys for RSA Encryption
+	 * 
+	 * @param commandLine
+	 * @throws CryptoException
+	 */
+	public static void loadKeys(CommandLine commandLine) throws CryptoException {
+		keyManager = new KeyManager();
+
+		if (commandLine.hasOption(PRIVATEKEY_CMDLINE_PARAM))
+			keyManager.readPrivateKey(
+					commandLine.getOptionValue(PRIVATEKEY_CMDLINE_PARAM), "");
+		else
+			; // TODO: load default key
+
+		if (commandLine.hasOption(PUBLICKEY_CMDLINE_PARAM))
+			keyManager.readPublicKey(commandLine
+					.getOptionValue(PUBLICKEY_CMDLINE_PARAM));
+		else
+			; // TODO: load default key
+
 	}
 
 	/**

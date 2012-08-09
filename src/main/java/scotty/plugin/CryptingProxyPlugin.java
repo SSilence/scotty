@@ -10,6 +10,7 @@ import org.owasp.webscarab.model.Response;
 import org.owasp.webscarab.plugin.proxy.ProxyPlugin;
 
 import scotty.Scotty;
+import scotty.crypto.KeyManager;
 import scotty.transformer.RequestTransformer;
 import scotty.transformer.ResponseTransformer;
 import scotty.transformer.impl.DefaultRequestTransformer;
@@ -26,12 +27,20 @@ public class CryptingProxyPlugin extends ProxyPlugin {
 
 	private Logger log = Logger.getLogger(getPluginName());
 
-	private RequestTransformer requestTransformer = new DefaultRequestTransformer();
+	private RequestTransformer requestTransformer;
 
-	private ResponseTransformer responseTransformer = new DefaultResponseTransformer();
+	private ResponseTransformer responseTransformer;
 
 	private UserAgentProvider uaProvider = new UserAgentProvider();
-
+	
+	private KeyManager keyManager;
+	
+	public CryptingProxyPlugin(KeyManager keyManager) {
+		this.keyManager = keyManager;
+		this.requestTransformer = new DefaultRequestTransformer(keyManager);
+		this.responseTransformer = new DefaultResponseTransformer(keyManager);
+	}
+	
 	@Override
 	public String getPluginName() {
 		return "CryptingProxyPlugin";

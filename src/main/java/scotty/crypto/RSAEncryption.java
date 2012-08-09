@@ -101,7 +101,7 @@ public class RSAEncryption {
 	 * @return
 	 * @throws CryptoException
 	 */
-	public static boolean checkSign(byte[] content, byte[] sign,
+	public static boolean verifySign(byte[] content, byte[] sign,
 			PublicKey publicKey) throws CryptoException {
 		// hash content
 		byte[] hashed = sha256(content);

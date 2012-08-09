@@ -4,12 +4,19 @@ import java.io.ByteArrayInputStream;
 
 import org.owasp.webscarab.model.Response;
 
+import scotty.crypto.KeyManager;
 import scotty.transformer.ResponseTransformer;
 
 
 
 public class DefaultResponseTransformer implements ResponseTransformer {
 
+	private KeyManager keyManager;
+	
+	public DefaultResponseTransformer(KeyManager keyManager) {
+		this.keyManager = keyManager;
+	}
+	
 	@Override
 	public Response transformResponse(byte[] response) {
 

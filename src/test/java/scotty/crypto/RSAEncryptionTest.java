@@ -61,7 +61,7 @@ public class RSAEncryptionTest {
 		byte[] content = new byte[] { 'a', 'b', 'c' };
 		byte[] sign = RSAEncryption.sign(content, keyManager.getPrivateKey());
 		assertFalse(Arrays.equals(content, sign));
-		assertTrue(RSAEncryption.checkSign(content, sign,
+		assertTrue(RSAEncryption.verifySign(content, sign,
 				keyManager.getPublicKey()));
 	}
 }
