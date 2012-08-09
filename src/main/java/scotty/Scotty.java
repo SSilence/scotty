@@ -24,11 +24,18 @@ import org.owasp.webscarab.plugin.CredentialManagerUI;
 import org.owasp.webscarab.plugin.Framework;
 import org.owasp.webscarab.plugin.proxy.ListenerSpec;
 import org.owasp.webscarab.plugin.proxy.Proxy;
+import org.owasp.webscarab.plugin.proxy.ProxyPlugin;
 import org.owasp.webscarab.ui.swing.CredentialRequestDialog;
 
 import scotty.crypto.CryptoException;
 import scotty.crypto.KeyManager;
-import scotty.plugin.CryptingProxyPlugin;
+import scotty.event.EventDispatcher;
+import scotty.event.EventObserver;
+import scotty.event.Events;
+import scotty.plugin.TransformingProxyPlugin;
+import scotty.ui.SystrayIndicatorProxyPlugin;
+import scotty.ui.SystrayManager;
+import scotty.util.Messages;
 
 import com.btr.proxy.search.ProxySearch;
 
@@ -41,7 +48,7 @@ import com.btr.proxy.search.ProxySearch;
  * @author flo
  * 
  */
-public class Scotty {
+public class Scotty implements EventObserver {
 	private static Logger log = Logger.getLogger(Scotty.class.getName());
 
 	private JFrame parent = new JFrame();
@@ -90,6 +97,19 @@ public class Scotty {
 	 * Default local port.
 	 */
 	private String defaultLocalPort = "8008";
+
+	/**
+	 * WebScarab framework.
+	 */
+	private Framework framework = new Framework();
+
+	private SystrayManager systray = new SystrayManager();
+
+	private Messages msgs = new Messages();
+
+	public Scotty() {
+		EventDispatcher.add(this);
+	}
 
 	/**
 	 * Initialize Scotty.
@@ -182,11 +202,10 @@ public class Scotty {
 	}
 
 	public void init() throws Exception {
+		systray.setTooltip(msgs.scotty() + " " + gatewayUrl);
+
 		configureProxySettings();
-
-		Framework framework = new Framework();
 		framework.setSession(null, null, null);
-
 		Preferences.setPreference("WebScarab.promptForCredentials", "true");
 		CredentialManager cm = framework.getCredentialManager();
 		CredentialManagerUI credentialRequestDialog = new CredentialRequestDialog(
@@ -199,8 +218,8 @@ public class Scotty {
 	}
 
 	/**
-	 * Loads the main plugin {@link CryptingProxyPlugin}. Starts the local proxy
-	 * server.
+	 * Loads the main plugin {@link TransformingProxyPlugin}. Starts the local
+	 * proxy server.
 	 * 
 	 * @param framework
 	 *            WebScarab Framework.
@@ -209,11 +228,27 @@ public class Scotty {
 		Proxy proxy = new Proxy(framework);
 		framework.addPlugin(proxy);
 
-		CryptingProxyPlugin cp = new CryptingProxyPlugin();
+		TransformingProxyPlugin cp = new TransformingProxyPlugin();
 		proxy.addPlugin(cp);
+
+		ProxyPlugin indicator = new SystrayIndicatorProxyPlugin(systray);
+		proxy.addPlugin(indicator);
 
 		for (ListenerSpec spec : proxy.getProxies()) {
 			proxy.addListener(spec);
+		}
+	}
+
+	@Override
+	public void eventReceived(Events event, Object o) {
+		if (event.equals(Events.EXIT)) {
+			try {
+				framework.stopPlugins();
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				System.exit(0);
+			}
 		}
 	}
 

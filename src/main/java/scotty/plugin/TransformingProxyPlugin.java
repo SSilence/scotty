@@ -17,12 +17,13 @@ import scotty.transformer.impl.DefaultResponseTransformer;
 import scotty.util.UserAgentProvider;
 
 /**
- * This plugin does the encryption and sends to the gateway.
+ * This plugin intercepts the request/response and does the transformation,
+ * specified by {@link RequestTransformer} and {@link ResponseTransformer}.
  * 
  * @author flo
  * 
  */
-public class CryptingProxyPlugin extends ProxyPlugin {
+public class TransformingProxyPlugin extends ProxyPlugin {
 
 	private Logger log = Logger.getLogger(getPluginName());
 
