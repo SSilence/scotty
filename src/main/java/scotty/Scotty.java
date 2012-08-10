@@ -42,7 +42,13 @@ import com.btr.proxy.search.ProxySearch;
 /**
  * Main class. scotty, transporter of freedom.
  * 
- * Usage: scotty [-g <Gateway-URL>] [-p <Local-Port>]
+ * Usage: scotty [-g <Gateway-URL>] [-p <Local-Port>] [ -d ] <br />
+ * <br />
+ * CLI Params: <br />
+ * <br />
+ * -g Gateway-url wg. http://my.gatew.ay/gate.php <br />
+ * -p local Port eg. 8008 <br />
+ * -d disables gateway usage, no value<br />
  * 
  * 
  * @author flo
@@ -57,7 +63,7 @@ public class Scotty implements EventObserver {
 	 * Use gateway - if false, scotty acts transparent as proxy.
 	 */
 	public static boolean useGateway = true;
-	
+
 	/**
 	 * CLI to disable the gateway usage
 	 */
@@ -214,8 +220,9 @@ public class Scotty implements EventObserver {
 		opts.addOption(PRIVATEKEY_CMDLINE_PARAM, true, "public key");
 		opts.addOption(PUBLICKEY_CMDLINE_PARAM, false, "private key");
 
-		opts.addOption(DONT_USE_GATEWAY, false, "Don't use gateway - direct connection.");
-		
+		opts.addOption(DONT_USE_GATEWAY, false,
+				"Don't use gateway - direct connection.");
+
 		CommandLineParser cmd = new PosixParser();
 		CommandLine line = cmd.parse(opts, args);
 
@@ -227,10 +234,10 @@ public class Scotty implements EventObserver {
 		Preferences.setPreference("Proxy.listeners", localAddr + ":"
 				+ localPort);
 
-		if ( line.hasOption(DONT_USE_GATEWAY) ) {
+		if (line.hasOption(DONT_USE_GATEWAY)) {
 			useGateway = false;
 		}
-		
+
 		return line;
 	}
 
