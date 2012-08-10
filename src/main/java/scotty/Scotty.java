@@ -1,7 +1,6 @@
 package scotty;
 
 import java.io.BufferedReader;
-import java.io.Console;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
@@ -58,6 +57,11 @@ public class Scotty implements EventObserver {
 	 * Use gateway - if false, scotty acts transparent as proxy.
 	 */
 	public static boolean useGateway = true;
+	
+	/**
+	 * CLI to disable the gateway usage
+	 */
+	private static String DONT_USE_GATEWAY = "d";
 
 	/**
 	 * CLI to specify gateway.
@@ -208,8 +212,10 @@ public class Scotty implements EventObserver {
 				"Local port, where scotty listens for requests");
 		opts.addOption(CREATEKEY_CMDLINE_PARAM, false, "Create new KeyPair");
 		opts.addOption(PRIVATEKEY_CMDLINE_PARAM, true, "public key");
-		opts.addOption(PUBLICKEY_CMDLINE_PARAM, true, "private key");
+		opts.addOption(PUBLICKEY_CMDLINE_PARAM, false, "private key");
 
+		opts.addOption(DONT_USE_GATEWAY, false, "Don't use gateway - direct connection.");
+		
 		CommandLineParser cmd = new PosixParser();
 		CommandLine line = cmd.parse(opts, args);
 
@@ -221,6 +227,10 @@ public class Scotty implements EventObserver {
 		Preferences.setPreference("Proxy.listeners", localAddr + ":"
 				+ localPort);
 
+		if ( line.hasOption(DONT_USE_GATEWAY) ) {
+			useGateway = false;
+		}
+		
 		return line;
 	}
 
