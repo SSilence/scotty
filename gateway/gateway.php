@@ -1,30 +1,6 @@
 <?php
 include('Crypt/RSA.php');
-
-/*
-$rsa = new Crypt_RSA();
-$rsa->setPrivateKeyFormat(CRYPT_RSA_PRIVATE_FORMAT_PKCS1);
-$rsa->setPublicKeyFormat(CRYPT_RSA_PUBLIC_FORMAT_PKCS1);
-die(var_dump($rsa->createKey(2048)));
-
-
-//$rsa->setPassword('password');
-$rsa->loadKey(file_get_contents('private'));
-
-$plaintext = 'test';
-
-$rsa->loadKey(file_get_contents('public'));
-
-//$rsa->setEncryptionMode(CRYPT_RSA_ENCRYPTION_PKCS1);
-$ciphertext = $rsa->encrypt($plaintext);
-
-$rsa->loadKey(file_get_contents('private'));
-var_dump($ciphertext);
-echo $rsa->decrypt($ciphertext);
-
-die("finished");
-*/
-
+include('Crypt/AES.php');
 
 /**
  * PHP based Gateway.
@@ -58,19 +34,42 @@ function http_parse_headers($header) {
     return $retVal;
 }
 
+//
 // read post data
-$request = file_get_contents('php://input');
-if(strlen(trim($request))==0)
+//
+$encryptedRequest = file_get_contents('php://input');
+if(strlen(trim($encryptedRequest))==0)
     die("no value given");
+$encryptedRequest = base64_decode($encryptedRequest);
 
-// decrypt request
-/*
+
+//
+// read AES password from request by decrypting with RSA
+//
 $rsa = new Crypt_RSA();
+$rsa->setEncryptionMode(CRYPT_RSA_ENCRYPTION_PKCS1);
 $rsa->loadKey(file_get_contents('private'));
-file_put_contents("c:\\tmp\\test.txt", $rsa->decrypt($request));
-*/
+$aesPassword = $rsa->decrypt(substr($encryptedRequest, 0, 256));
 
+//
+// decrypt request with AES
+//
+$aes = new Crypt_AES(CRYPT_AES_MODE_ECB);
+
+// PKCS5 Padding used by java
+$aes->enablePadding();
+
+// password is the first 16 byte of a SHA 256 hashed given aes password
+$aesPasswordHashed = substr(hash("sha256", $aesPassword, true), 0, 16);
+
+$aes->setKey($aesPasswordHashed);
+$request = $aes->decrypt(substr($encryptedRequest, 256));
+
+
+//
 // check sign of the request
+//
+// TODO
 
 // get target url from header (host)
 $host = "";

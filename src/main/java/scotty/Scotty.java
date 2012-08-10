@@ -217,8 +217,8 @@ public class Scotty implements EventObserver {
 		opts.addOption(LOCALPORT_CMDLINE_PARAM, true,
 				"Local port, where scotty listens for requests");
 		opts.addOption(CREATEKEY_CMDLINE_PARAM, false, "Create new KeyPair");
-		opts.addOption(PRIVATEKEY_CMDLINE_PARAM, true, "public key");
-		opts.addOption(PUBLICKEY_CMDLINE_PARAM, false, "private key");
+		opts.addOption(PRIVATEKEY_CMDLINE_PARAM, true, "private key");
+		opts.addOption(PUBLICKEY_CMDLINE_PARAM, true, "public key");
 
 		opts.addOption(DONT_USE_GATEWAY, false,
 				"Don't use gateway - direct connection.");

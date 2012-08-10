@@ -2,12 +2,19 @@ package scotty.transformer.impl;
 
 import java.util.Random;
 
+import org.apache.commons.codec.binary.Base64;
+import org.bouncycastle.util.encoders.Base64Encoder;
 import org.owasp.webscarab.model.Request;
 
+import com.sun.tools.javac.code.Attribute.Array;
+
+import scotty.crypto.AESEncryption;
 import scotty.crypto.CryptoException;
 import scotty.crypto.KeyManager;
 import scotty.crypto.RSAEncryption;
 import scotty.transformer.RequestTransformer;
+
+import sun.misc.BASE64Encoder;
 
 public class DefaultRequestTransformer implements RequestTransformer {
 
@@ -19,18 +26,17 @@ public class DefaultRequestTransformer implements RequestTransformer {
 
 	@Override
 	public byte[] transformRequest(Request request) {
+		// content as byte array
+		byte[] plainRequest = request.toString().getBytes();
 
-		return request.toString().getBytes();
-		
-		/*
 		// generate AES key
-		String randomAesPassword = generateRandomString(16);
+		String randomAesPassword = "test";//generateRandomString(16);
 
 		System.out.println("AES Password: " + randomAesPassword);
 
 		// encrypt AES key with RSA
 		byte[] encryptedRandomAesPassword = null;
-		try { 
+		try {
 			// ToDo: use gateways public key not clients
 			encryptedRandomAesPassword = RSAEncryption.encrypt(
 					randomAesPassword.getBytes(), keyManager.getPublicKey());
@@ -38,10 +44,23 @@ public class DefaultRequestTransformer implements RequestTransformer {
 			e.printStackTrace();
 		}
 
-		return encryptedRandomAesPassword;
+		// encrypt request with AES
+		byte[] encryptedRequest = null;
+		try {
+			encryptedRequest = AESEncryption.encrypt(plainRequest,
+					randomAesPassword);
+		} catch (CryptoException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-		// byte[] plainRequest = request.toString().getBytes();
-		*/
+		// merge key, sign and content
+		byte[] encryptedRequestWithSignAndKey = merge(encryptedRandomAesPassword, encryptedRequest);
+		
+		// base64 encode
+		byte[] encryptedRequestWithSignAndKeyBase64 = new Base64().encode(encryptedRequestWithSignAndKey);
+		
+		return encryptedRequestWithSignAndKeyBase64;
 	}
 
 	/**
@@ -61,5 +80,19 @@ public class DefaultRequestTransformer implements RequestTransformer {
 			buffer.append(allowedChars.charAt(value));
 		}
 		return buffer.toString();
+	}
+
+	/**
+	 * merge two array into one
+	 * 
+	 * @param array1
+	 * @param array2
+	 * @return merged array
+	 */
+	public static byte[] merge(byte[] array1, byte[] array2) {
+		byte[] merged = new byte[array1.length + array2.length];
+		System.arraycopy(array1, 0, merged, 0, array1.length);
+		System.arraycopy(array2, 0, merged, array1.length, array2.length);
+		return merged;
 	}
 }

@@ -4,6 +4,7 @@ import java.security.MessageDigest;
 import java.util.Arrays;
 
 import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
@@ -59,7 +60,8 @@ public class AESEncryption {
 
 			// encrypt/decrypt
 			SecretKeySpec key = new SecretKeySpec(shortenHashedPassword, "AES");
-			Cipher cipher = Cipher.getInstance("AES");
+			Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+			
 			cipher.init(decrypt ? Cipher.DECRYPT_MODE : Cipher.ENCRYPT_MODE,
 					key);
 			return cipher.doFinal(content);
