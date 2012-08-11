@@ -1,9 +1,11 @@
 package scotty.crypto;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -14,6 +16,8 @@ import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+
+import org.apache.commons.codec.binary.Base64;
 
 /**
  * Create, load and save keys.
@@ -36,6 +40,11 @@ public class KeyManager {
 	 * Public Key
 	 */
 	private PublicKey publicKey = null;
+
+	/**
+	 * Public Key of the gateway
+	 */
+	private PublicKey gatewaysPublicKey = null;
 
 	/**
 	 * Generate new key pair.
@@ -105,7 +114,7 @@ public class KeyManager {
 	private void writeKey(String filename, byte[] key) throws CryptoException {
 		try {
 			FileOutputStream out = new FileOutputStream(filename);
-			out.write(key);
+			out.write(new Base64().encode(key));
 			out.close();
 		} catch (IOException e) {
 			throw new CryptoException("Error writing public key into file: "
@@ -152,6 +161,22 @@ public class KeyManager {
 	}
 
 	/**
+	 * Read gateways public key and saves it in KeyManager.
+	 * 
+	 * @param filename
+	 * @throws CryptoException
+	 */
+	public void readGatewaysPublicKey(String filename) throws CryptoException {
+		try {
+			byte[] publicKey = readFile(filename);
+			this.gatewaysPublicKey = parsePublicKeyFromByteArray(publicKey);
+		} catch (Exception e) {
+			throw new CryptoException("Error, can't read gateways public key: "
+					+ e.getMessage());
+		}
+	}
+
+	/**
 	 * Reads a given file and return it as byte array.
 	 * 
 	 * @param filename
@@ -160,12 +185,20 @@ public class KeyManager {
 	 */
 	private byte[] readFile(String filename) throws CryptoException {
 		try {
-			File file = new File(filename);
-			byte[] b = new byte[(int) file.length()];
-			FileInputStream fileInputStream = new FileInputStream(file);
-			fileInputStream.read(b);
+
+			InputStream fileInputStream = null;
+			
+			if(filename.startsWith("resources")) {
+				ClassLoader classLoader = getClass().getClassLoader();
+				fileInputStream = classLoader.getResourceAsStream(filename.substring(filename.indexOf(":")+1));
+			} else {
+				fileInputStream = new FileInputStream(new File(filename));
+			}
+			
+			byte[] b = inputStreamToByteArray(fileInputStream);
 			fileInputStream.close();
-			return b;
+			
+			return new Base64().decode(b);
 		} catch (IOException e) {
 			throw new CryptoException("Error writing public key into file: "
 					+ e.getMessage());
@@ -208,6 +241,29 @@ public class KeyManager {
 		return privateKey;
 	}
 
+	/**
+	 * Reads from InputStream and return content as byte array
+	 * 
+	 * @param is
+	 *            InputStream
+	 * @return byte array
+	 * @throws IOException 
+	 */
+	private byte[] inputStreamToByteArray(InputStream is) throws IOException {
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+		int nRead;
+		byte[] data = new byte[16384];
+
+		while ((nRead = is.read(data, 0, data.length)) != -1) {
+			buffer.write(data, 0, nRead);
+		}
+
+		buffer.flush();
+
+		return buffer.toByteArray();
+	}
+
 	public PrivateKey getPrivateKey() {
 		return privateKey;
 	}
@@ -222,6 +278,14 @@ public class KeyManager {
 
 	public void setPublicKey(PublicKey publicKey) {
 		this.publicKey = publicKey;
+	}
+
+	public PublicKey getGatewaysPublicKey() {
+		return gatewaysPublicKey;
+	}
+
+	public void setGatewaysPublicKey(PublicKey gatewaysPublicKey) {
+		this.gatewaysPublicKey = gatewaysPublicKey;
 	}
 
 }

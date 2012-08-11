@@ -36,10 +36,13 @@ public class TransformingProxyPlugin extends ProxyPlugin {
 	
 	private KeyManager keyManager;
 	
-	public TransformingProxyPlugin(KeyManager keyManager) {
+	private boolean disableEncryption;
+	
+	public TransformingProxyPlugin(KeyManager keyManager, boolean disableEncryption) {
 		this.keyManager = keyManager;
-		this.requestTransformer = new DefaultRequestTransformer(keyManager);
-		this.responseTransformer = new DefaultResponseTransformer(keyManager);
+		this.disableEncryption = disableEncryption;
+		this.requestTransformer = new DefaultRequestTransformer(keyManager, disableEncryption);
+		this.responseTransformer = new DefaultResponseTransformer(keyManager, disableEncryption);
 	}
 	
 	@Override

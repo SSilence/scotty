@@ -13,8 +13,11 @@ public class DefaultResponseTransformer implements ResponseTransformer {
 
 	private KeyManager keyManager;
 	
-	public DefaultResponseTransformer(KeyManager keyManager) {
+	private boolean disableEncryption;
+	
+	public DefaultResponseTransformer(KeyManager keyManager, boolean disableEncryption) {
 		this.keyManager = keyManager;
+		this.disableEncryption = disableEncryption;
 	}
 	
 	@Override

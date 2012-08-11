@@ -63,7 +63,12 @@ public class Scotty implements EventObserver {
 	 * Use gateway - if false, scotty acts transparent as proxy.
 	 */
 	public static boolean useGateway = true;
-
+	
+	/**
+	 * Use encryption - if false, scotty will not encrypt requests
+	 */
+	public static boolean disableEncryption = false;
+	
 	/**
 	 * CLI to disable the gateway usage
 	 */
@@ -85,6 +90,11 @@ public class Scotty implements EventObserver {
 	private static final String CREATEKEY_CMDLINE_PARAM = "c";
 
 	/**
+	 * CLI to specify gateway.
+	 */
+	private static final String DISABLE_ENCRYPTION_CMDLINE_PARAM = "disableencryption";
+	
+	/**
 	 * CLI for private key
 	 */
 	private static final String PRIVATEKEY_CMDLINE_PARAM = "privatekey";
@@ -94,6 +104,26 @@ public class Scotty implements EventObserver {
 	 */
 	private static final String PUBLICKEY_CMDLINE_PARAM = "publickey";
 
+	/**
+	 * CLI for gateways public key
+	 */
+	private static final String GATEWAYSPUBLICKEY_CMDLINE_PARAM = "gatewayspublickey";
+
+	/**
+	 * default private key
+	 */
+	private static final String DEFAULT_PRIVATEKEY = "resources:defaultprivatekey";
+	
+	/**
+	 * default public key
+	 */
+	private static final String DEFAULT_PUBLICKEY = "resources:defaultpublickey";
+	
+	/**
+	 * default gateways key
+	 */
+	private static final String DEFAULT_GATEWAYSPUBLICKEY = "resources:gatewaydefaultpublickey";
+	
 	/**
 	 * Key Manager for RSA Key Access
 	 */
@@ -219,7 +249,8 @@ public class Scotty implements EventObserver {
 		opts.addOption(CREATEKEY_CMDLINE_PARAM, false, "Create new KeyPair");
 		opts.addOption(PRIVATEKEY_CMDLINE_PARAM, true, "private key");
 		opts.addOption(PUBLICKEY_CMDLINE_PARAM, true, "public key");
-
+		opts.addOption(DISABLE_ENCRYPTION_CMDLINE_PARAM, false, "disable encryption");
+		
 		opts.addOption(DONT_USE_GATEWAY, false,
 				"Don't use gateway - direct connection.");
 
@@ -238,6 +269,11 @@ public class Scotty implements EventObserver {
 			useGateway = false;
 		}
 
+		if (line.hasOption(DISABLE_ENCRYPTION_CMDLINE_PARAM)) {
+			disableEncryption = true;
+		}
+		
+		
 		return line;
 	}
 
@@ -268,7 +304,7 @@ public class Scotty implements EventObserver {
 		Proxy proxy = new Proxy(framework);
 		framework.addPlugin(proxy);
 
-		TransformingProxyPlugin cp = new TransformingProxyPlugin(keyManager);
+		TransformingProxyPlugin cp = new TransformingProxyPlugin(keyManager, disableEncryption);
 		proxy.addPlugin(cp);
 
 		ProxyPlugin indicator = new SystrayIndicatorProxyPlugin(systray);
@@ -305,14 +341,19 @@ public class Scotty implements EventObserver {
 			keyManager.readPrivateKey(
 					commandLine.getOptionValue(PRIVATEKEY_CMDLINE_PARAM), "");
 		else
-			; // TODO: load default key
+			keyManager.readPrivateKey(DEFAULT_PRIVATEKEY, "");
 
 		if (commandLine.hasOption(PUBLICKEY_CMDLINE_PARAM))
 			keyManager.readPublicKey(commandLine
 					.getOptionValue(PUBLICKEY_CMDLINE_PARAM));
 		else
-			; // TODO: load default key
+			keyManager.readPublicKey(DEFAULT_PUBLICKEY);
 
+		if (commandLine.hasOption(GATEWAYSPUBLICKEY_CMDLINE_PARAM))
+			keyManager.readGatewaysPublicKey(commandLine
+					.getOptionValue(GATEWAYSPUBLICKEY_CMDLINE_PARAM));
+		else
+			keyManager.readGatewaysPublicKey(DEFAULT_GATEWAYSPUBLICKEY);
 	}
 
 	/**
