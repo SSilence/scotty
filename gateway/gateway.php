@@ -32,8 +32,11 @@ $dirClientPublicKeys = false;
 // optional error page which will be included
 $showErrorPage = false;
 
+// name of the keycache file
+$keyCacheFile = "keycache";
 
-
+// max time in seconds a given token is valid
+$maxTimestampValidity = 5400; // 1.5 hours
 
 
 // to all non php nerds: don't change anything behind this line
@@ -60,8 +63,6 @@ $privateKey = base64_decode($defaultPrivateKey);
 if(file_exists("publickey"))
     $privateKey = base64_decode(file_get_contents("publickey"));
 
-// allowed public keys of clients
-
 // use clients public keys if directory was set
 if($dirClientPublicKeys!=false && file_exists($dirClientPublicKeys) && $handle = opendir($dirClientPublicKeys)) {
     $clientPublicKeys = array();
@@ -76,6 +77,23 @@ for($i=0;$i<count($clientPublicKeys);$i++)
     $clientPublicKeys[$i] = base64_decode($clientPublicKeys[$i]);
 
 
+//
+// load key cache
+//
+$keyCache = array();
+if(!file_exists($keyCacheFile))
+    touch($keyCacheFile);
+$keyCacheFileContent = file_get_contents($keyCacheFile);
+if(strlen($keyCacheFileContent)>0)
+    $keyCache = json_decode($keyCacheFileContent);
+
+// cleanup cache
+foreach($keyCache as $token => $value) {
+    if($value->timestamp+$maxTimestampValidity<time())
+        unset($keyCache[$token]);
+}
+
+
 
 //
 // functions
@@ -83,10 +101,11 @@ for($i=0;$i<count($clientPublicKeys);$i++)
  
 // shows error message or error page
 function error($error) {
+    global $showErrorPage;
     if($showErrorPage===false)
         die($error);
     else {
-        include $showErrorPage;
+        include($showErrorPage);
         die();
     }
 }
@@ -108,25 +127,83 @@ function http_parse_headers($header) {
     return $retVal;
 }
 
+
 //
 // read post data
 //
 $encryptedRequest = file_get_contents('php://input');
 if(strlen(trim($encryptedRequest))==0)
-    error("no value given");
+    ;//error("no value given");
 
-if($useEncryption===true) {    
-    $encryptedRequest = base64_decode($encryptedRequest);
-
-
+if(strlen(trim($encryptedRequest))==0)
+    $encryptedRequest = "hWXtmCWNc8B2Q0PtEy5X4fffkGCcwNVqhEgN+gvs9SqsgFzIhkIO4owgK0Ld22zDb9fDNDI6ex4O8Ika8EbokmQ52AR7Epwm3msd6iJQokOfBsD5HCx2ycDOztdJGJXyi5lhLpk34Zma0bE4gsApka+Ynpobcx5vQzu4WeL8rPRtdSPnbwxy4DUiGsD45tbTBPWSdLocIRvVZtD9n2s7Q+qk0z9LEoK1v8JZxRj45c1Dv/nB2O78PZeXCuTkVqn0CD08hVovwY+qwwbWlo7A8EkT4uFfsVOA6v4qy7fHWxd210Bktg0Ro9NNmcyVfOWb0tw3+mvVQcBbLtsS8tjd9A==|ImnzYVc/P/0RMWpAgpoZ4AjElcyVCmlBVIynUcrLdyXsvznA6eyJasFWp3ltKgW+Jb/sQrOz8DUwfIaPF0O2GtxgZ7ncuT3JzC+ONrR623nbqwIdg/T1XcA5KfT0tnqK89oWkQz+YBj8YslgaQb5gnc/taECupbWB/m7TQw3C2X50aIaYVRUhxfWXthXUMJ9OMBy7MJigcDdkbm5iXDDhWe3HIxmcAhtLZzVSWBHMDcem1P4UHtsDsqjZSiidTJJ1NnjHSxg5UUn0GmRjK9c6jV6U/78wPII6gVuRjAqVjF3e0JD2IsE8cHx+IrKtckB/1N9rrwFZBkBcnldiB4+dA==|hNboT6eKBFqfOWl8XhtpZKc23YM+kNbeX1cVBO0uBaEmxGVc9eTPdcYthI3HkRWSH7/w85rBsAUhbb8LHcSmUUYk65aJw0lSEPzycwofHWbi0mZ0INHTQtzBuUNS7kMlyucx6ZCyJr3OZ/I+7vfS1YPWMXWRjwY0wcXO2EKknk26SsBwfU0hvOYHLlJZoqkxDcKENkVx//T9o4LfMY1CywexQAZdDmhCf8NWOaGUm6M8eD5W88CHKhBilBBqvAT8br9UXJdy6u/a1Xd+YtkZEc5FMkfkilXOHoHTDm5TeegbqQu9jqXsdSi4cQl6w3b6F2O1xIaYWPVk+akHTkld2JCbTkc/xbNC2t+T47vhMwE5cnG0Lqhzmqzc1+O4R4eqIsKNgNqzJBY/u5nt6U+agdT36imjeTPsL0Q9BW695CZJtyB87UiycKD1StRdOdyEbWr0AKsyzZjRZhwyStB7j6jMNfUik2yrKwvVUzg5ahx1zbVrFliqkMJJXD2uTbL2p+G6HWNeUMfIgq4J9tJ57c4l1jr/DI/QPKSOUYD+dSzRTfeEcbO1HG5Jqv7XZ09dRRff+lCH3plFk1ni4DEH57xmfyHh3S1shYtBMmQRpntzixz4zmaRmIicvoxEnxf80tZoYZDUiMoQgG25QVWAUHNOswU6I6Set9ZGS0dpz+7s8zYDyEoBGO3sMAR2byjip9V4T/U0IRlMdsqGD030MdhrBdbGvFAsr0uKe2z6Xhitby7t+WMbYvA7CA6J9PFS8PyWNyG++kK0EIGO+6TZVtvws/HZ3XriPFS1kkH4IsE=";
+else
+    file_put_contents("c:\\tmp\\test.txt", $encryptedRequest);
+    
+if($useEncryption===true) {
     //
-    // read AES password from request by decrypting with RSA
+    // parse encrypted request
     //
-    $rsa = new Crypt_RSA();
-    $rsa->setEncryptionMode(CRYPT_RSA_ENCRYPTION_PKCS1);
-    $rsa->loadKey($privateKey);
-    $aesPassword = $rsa->decrypt(substr($encryptedRequest, 0, 256));
-
+    $encryptedRequestParts = preg_split("/\|/", $encryptedRequest);
+    if(count($encryptedRequestParts)<3)
+        error("wrong request");
+    
+    $token = $encryptedRequestParts[0];
+    $tokenSign = $encryptedRequestParts[1];
+    $data = $encryptedRequestParts[2];
+    
+    //
+    // read aes password from cache
+    //
+    $aesPassword = "";
+    if(isset($keyCache->$token))
+        $aesPassword = $keyCache->$token->aes;
+    
+    //
+    // no aes password in cache? verify token
+    //
+    if(strlen($aesPassword)==0) {
+        // decript token with rsa
+        $rsa = new Crypt_RSA();
+        $rsa->setEncryptionMode(CRYPT_RSA_ENCRYPTION_PKCS1);
+        $rsa->loadKey($privateKey);
+        $decryptedToken = $rsa->decrypt(base64_decode($token));
+        
+        // read password and timestamp
+        $decryptedTokenParts = preg_split("/\|/", $decryptedToken);
+        if(count($decryptedTokenParts)<2)
+            error("wrong token");
+        $aesPassword = $decryptedTokenParts[0];
+        $tokenTimestamp = $decryptedTokenParts[1];
+        
+        // check timestamp
+        if($tokenTimestamp+$maxTimestampValidity<time())
+            error("invalid token timestamp");
+        
+        // check sign
+        $hashedAesPasswordAndTimestamp = hash("sha256", $aesPassword . "|" . $tokenTimestamp, true);
+        $validSign = false;
+        foreach($clientPublicKeys as $publicKey) {
+            $rsa->loadKey($publicKey);
+            $decryptedSign = $rsa->decrypt(base64_decode($tokenSign));
+            if($decryptedSign==$hashedAesPasswordAndTimestamp) {
+                $validSign = true;
+                break;
+            }
+        }
+        if($validSign !== true)
+            error("invalid token sign");
+        
+        // all ok: save token in cache
+        $keyCache->$token = array(
+            "timestamp" => time(),
+            "aes" => $aesPassword
+        );
+        
+        // write back cache
+        file_put_contents($keyCacheFile, json_encode($keyCache));
+    }
+    
     //
     // decrypt request with AES
     //
@@ -139,12 +216,7 @@ if($useEncryption===true) {
     $aesPasswordHashed = substr(hash("sha256", $aesPassword, true), 0, 16);
 
     $aes->setKey($aesPasswordHashed);
-    $request = $aes->decrypt(substr($encryptedRequest, 256));
-
-    //
-    // check sign of the request
-    //
-    // TODO
+    $request = $aes->decrypt(base64_decode($data));
 
 } else {
     $request = $encryptedRequest;
@@ -228,12 +300,14 @@ while(!feof($connection)) {
 fclose($connection);
 
 //
-// sign
-//
-
-//
 // encrypt
 //
+if($useEncryption===true) {
+    $aes = new Crypt_AES(CRYPT_AES_MODE_ECB);
+    $aes->enablePadding();
+    $aes->setKey($aesPasswordHashed);
+    $response = base64_encode($aes->encrypt($response));
+}
 
 //
 // send response

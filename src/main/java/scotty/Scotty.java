@@ -70,6 +70,11 @@ public class Scotty implements EventObserver {
 	public static boolean disableEncryption = false;
 	
 	/**
+	 * Timeout for the RSA Token, default: 1 hour
+	 */
+	public static long tokenTimeout = 3600;
+	
+	/**
 	 * CLI to disable the gateway usage
 	 */
 	private static String DONT_USE_GATEWAY = "d";
@@ -89,6 +94,11 @@ public class Scotty implements EventObserver {
 	 */
 	private static final String CREATEKEY_CMDLINE_PARAM = "c";
 
+	/**
+	 * CLI for creating a new key pair
+	 */
+	private static final String TOKENTIMEOUT_CMDLINE_PARAM = "timeout";
+	
 	/**
 	 * CLI to specify gateway.
 	 */
@@ -123,7 +133,7 @@ public class Scotty implements EventObserver {
 	 * default gateways key
 	 */
 	private static final String DEFAULT_GATEWAYSPUBLICKEY = "resources:gatewaydefaultpublickey";
-	
+
 	/**
 	 * Key Manager for RSA Key Access
 	 */
@@ -250,6 +260,7 @@ public class Scotty implements EventObserver {
 		opts.addOption(PRIVATEKEY_CMDLINE_PARAM, true, "private key");
 		opts.addOption(PUBLICKEY_CMDLINE_PARAM, true, "public key");
 		opts.addOption(DISABLE_ENCRYPTION_CMDLINE_PARAM, false, "disable encryption");
+		opts.addOption(TOKENTIMEOUT_CMDLINE_PARAM, true, "timeout for the RSA token (default = 1.5 hours)");
 		
 		opts.addOption(DONT_USE_GATEWAY, false,
 				"Don't use gateway - direct connection.");
@@ -272,7 +283,6 @@ public class Scotty implements EventObserver {
 		if (line.hasOption(DISABLE_ENCRYPTION_CMDLINE_PARAM)) {
 			disableEncryption = true;
 		}
-		
 		
 		return line;
 	}
@@ -354,6 +364,11 @@ public class Scotty implements EventObserver {
 					.getOptionValue(GATEWAYSPUBLICKEY_CMDLINE_PARAM));
 		else
 			keyManager.readGatewaysPublicKey(DEFAULT_GATEWAYSPUBLICKEY);
+		
+		if (commandLine.hasOption(TOKENTIMEOUT_CMDLINE_PARAM)) {
+			tokenTimeout = Long.parseLong(commandLine.getOptionValue(TOKENTIMEOUT_CMDLINE_PARAM));
+		}
+		keyManager.setMaxValidityOfToken(tokenTimeout);
 	}
 
 	/**

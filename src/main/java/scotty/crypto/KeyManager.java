@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -16,6 +17,8 @@ import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Date;
+import java.util.Random;
 
 import org.apache.commons.codec.binary.Base64;
 
@@ -25,6 +28,11 @@ import org.apache.commons.codec.binary.Base64;
  * @author Tobias Zeising tobias.zeising@aditu.de http://www.aditu.de
  */
 public class KeyManager {
+
+	/**
+	 * Constant for no token set
+	 */
+	public static final int NO_TOKEN_SET = -1;
 
 	/**
 	 * Length of the RSA Key
@@ -45,6 +53,26 @@ public class KeyManager {
 	 * Public Key of the gateway
 	 */
 	private PublicKey gatewaysPublicKey = null;
+
+	/**
+	 * Current RSA signed AES Password
+	 */
+	private byte[] currentToken;
+
+	/**
+	 * Current AES Password
+	 */
+	private String currentAESPassword;
+
+	/**
+	 * Timestamp where current token was created
+	 */
+	private long currentTokenTimestamp = NO_TOKEN_SET;
+
+	/**
+	 * Max validity of token
+	 */
+	private long maxValidityOfToken;
 
 	/**
 	 * Generate new key pair.
@@ -187,17 +215,18 @@ public class KeyManager {
 		try {
 
 			InputStream fileInputStream = null;
-			
-			if(filename.startsWith("resources")) {
+
+			if (filename.startsWith("resources")) {
 				ClassLoader classLoader = getClass().getClassLoader();
-				fileInputStream = classLoader.getResourceAsStream(filename.substring(filename.indexOf(":")+1));
+				fileInputStream = classLoader.getResourceAsStream(filename
+						.substring(filename.indexOf(":") + 1));
 			} else {
 				fileInputStream = new FileInputStream(new File(filename));
 			}
-			
+
 			byte[] b = inputStreamToByteArray(fileInputStream);
 			fileInputStream.close();
-			
+
 			return new Base64().decode(b);
 		} catch (IOException e) {
 			throw new CryptoException("Error writing public key into file: "
@@ -247,7 +276,7 @@ public class KeyManager {
 	 * @param is
 	 *            InputStream
 	 * @return byte array
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	private byte[] inputStreamToByteArray(InputStream is) throws IOException {
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -262,6 +291,76 @@ public class KeyManager {
 		buffer.flush();
 
 		return buffer.toByteArray();
+	}
+
+	/**
+	 * Returns current token. If token is no longer valid, a new one will be
+	 * generated.
+	 * 
+	 * @return current token
+	 * @throws CryptoException
+	 */
+	public synchronized byte[] getCurrentToken() throws CryptoException {
+		try {
+			// valid token available?
+			long timestamp = (new Date().getTime()) / 1000;
+			if (currentTokenTimestamp != NO_TOKEN_SET
+					&& timestamp < currentTokenTimestamp + maxValidityOfToken) {
+				return currentToken;
+			}
+
+			// generate new token
+			StringBuilder aesPasswordAndTimestamp = new StringBuilder();
+
+			// generate AES key
+			String randomAesPassword = generateRandomString(16);
+			aesPasswordAndTimestamp.append(randomAesPassword);
+			aesPasswordAndTimestamp.append(new String("|")); // separator
+			aesPasswordAndTimestamp.append(timestamp);
+
+			// encrypt token with gateways public key
+			byte[] encryptedToken = RSAEncryption.encrypt(
+					aesPasswordAndTimestamp.toString().getBytes(),
+					getGatewaysPublicKey());
+
+			// sign AES key and password
+			byte[] sign = RSAEncryption.sign(aesPasswordAndTimestamp.toString()
+					.getBytes(), privateKey);
+			
+			Base64 base64 = new Base64();
+			StringBuilder encryptedAesTimestampAndSign = new StringBuilder();
+			encryptedAesTimestampAndSign.append(new String(base64.encode(encryptedToken)));
+			encryptedAesTimestampAndSign.append(new String("|")); // separator
+			encryptedAesTimestampAndSign.append(new String(base64.encode(sign)));
+
+			this.currentToken = encryptedAesTimestampAndSign.toString().getBytes();
+			this.currentAESPassword = randomAesPassword;
+			this.currentTokenTimestamp = timestamp;
+
+			return currentToken;
+		} catch (Exception e) {
+			throw new CryptoException(e);
+		}
+
+	}
+
+	/**
+	 * Generates an random string
+	 * 
+	 * @param length
+	 *            of the string
+	 * @return random string
+	 */
+	private static String generateRandomString(int length) {
+		String allowedChars = "0123456789abcdefghijklmnopqrstuvwxyz";
+		Random random = new Random();
+		int max = allowedChars.length();
+		StringBuffer buffer = new StringBuffer();
+		for (int i = 0; i < length; i++) {
+			int value = random.nextInt(max);
+			buffer.append(allowedChars.charAt(value));
+		}
+		return buffer.toString();
 	}
 
 	public PrivateKey getPrivateKey() {
@@ -286,6 +385,34 @@ public class KeyManager {
 
 	public void setGatewaysPublicKey(PublicKey gatewaysPublicKey) {
 		this.gatewaysPublicKey = gatewaysPublicKey;
+	}
+
+	public String getCurrentAESPassword() {
+		return currentAESPassword;
+	}
+
+	public void setCurrentAESPassword(String currentAESPassword) {
+		this.currentAESPassword = currentAESPassword;
+	}
+
+	public long getCurrentTokenTimestamp() {
+		return currentTokenTimestamp;
+	}
+
+	public void setCurrentTokenTimestamp(long currentTokenTimestamp) {
+		this.currentTokenTimestamp = currentTokenTimestamp;
+	}
+
+	public long getMaxValidityOfToken() {
+		return maxValidityOfToken;
+	}
+
+	public void setMaxValidityOfToken(long maxValidityOfToken) {
+		this.maxValidityOfToken = maxValidityOfToken;
+	}
+
+	public void setCurrentToken(byte[] currentToken) {
+		this.currentToken = currentToken;
 	}
 
 }
