@@ -63,17 +63,17 @@ public class Scotty implements EventObserver {
 	 * Use gateway - if false, scotty acts transparent as proxy.
 	 */
 	public static boolean useGateway = true;
-	
+
 	/**
 	 * Use encryption - if false, scotty will not encrypt requests
 	 */
 	public static boolean disableEncryption = false;
-	
+
 	/**
 	 * Timeout for the RSA Token, default: 1 hour
 	 */
 	public static long tokenTimeout = 3600;
-	
+
 	/**
 	 * CLI to disable the gateway usage
 	 */
@@ -98,12 +98,12 @@ public class Scotty implements EventObserver {
 	 * CLI for creating a new key pair
 	 */
 	private static final String TOKENTIMEOUT_CMDLINE_PARAM = "timeout";
-	
+
 	/**
 	 * CLI to specify gateway.
 	 */
 	private static final String DISABLE_ENCRYPTION_CMDLINE_PARAM = "disableencryption";
-	
+
 	/**
 	 * CLI for private key
 	 */
@@ -123,12 +123,12 @@ public class Scotty implements EventObserver {
 	 * default private key
 	 */
 	private static final String DEFAULT_PRIVATEKEY = "resources:defaultprivatekey";
-	
+
 	/**
 	 * default public key
 	 */
 	private static final String DEFAULT_PUBLICKEY = "resources:defaultpublickey";
-	
+
 	/**
 	 * default gateways key
 	 */
@@ -259,9 +259,11 @@ public class Scotty implements EventObserver {
 		opts.addOption(CREATEKEY_CMDLINE_PARAM, false, "Create new KeyPair");
 		opts.addOption(PRIVATEKEY_CMDLINE_PARAM, true, "private key");
 		opts.addOption(PUBLICKEY_CMDLINE_PARAM, true, "public key");
-		opts.addOption(DISABLE_ENCRYPTION_CMDLINE_PARAM, false, "disable encryption");
-		opts.addOption(TOKENTIMEOUT_CMDLINE_PARAM, true, "timeout for the RSA token (default = 1.5 hours)");
-		
+		opts.addOption(DISABLE_ENCRYPTION_CMDLINE_PARAM, false,
+				"disable encryption");
+		opts.addOption(TOKENTIMEOUT_CMDLINE_PARAM, true,
+				"timeout for the RSA token (default = 1.5 hours)");
+
 		opts.addOption(DONT_USE_GATEWAY, false,
 				"Don't use gateway - direct connection.");
 
@@ -283,7 +285,7 @@ public class Scotty implements EventObserver {
 		if (line.hasOption(DISABLE_ENCRYPTION_CMDLINE_PARAM)) {
 			disableEncryption = true;
 		}
-		
+
 		return line;
 	}
 
@@ -314,7 +316,8 @@ public class Scotty implements EventObserver {
 		Proxy proxy = new Proxy(framework);
 		framework.addPlugin(proxy);
 
-		TransformingProxyPlugin cp = new TransformingProxyPlugin(keyManager, disableEncryption);
+		TransformingProxyPlugin cp = new TransformingProxyPlugin(keyManager,
+				disableEncryption);
 		proxy.addPlugin(cp);
 
 		ProxyPlugin indicator = new SystrayIndicatorProxyPlugin(systray);
@@ -325,6 +328,14 @@ public class Scotty implements EventObserver {
 		}
 	}
 
+	/**
+	 * Eventhandler for Systray Icon
+	 * 
+	 * @param event
+	 *            exit event
+	 * @param o
+	 *            optional param
+	 */
 	@Override
 	public void eventReceived(Events event, Object o) {
 		if (event.equals(Events.EXIT)) {
@@ -364,9 +375,10 @@ public class Scotty implements EventObserver {
 					.getOptionValue(GATEWAYSPUBLICKEY_CMDLINE_PARAM));
 		else
 			keyManager.readGatewaysPublicKey(DEFAULT_GATEWAYSPUBLICKEY);
-		
+
 		if (commandLine.hasOption(TOKENTIMEOUT_CMDLINE_PARAM)) {
-			tokenTimeout = Long.parseLong(commandLine.getOptionValue(TOKENTIMEOUT_CMDLINE_PARAM));
+			tokenTimeout = Long.parseLong(commandLine
+					.getOptionValue(TOKENTIMEOUT_CMDLINE_PARAM));
 		}
 		keyManager.setMaxValidityOfToken(tokenTimeout);
 	}

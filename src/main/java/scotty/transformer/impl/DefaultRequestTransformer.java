@@ -3,7 +3,6 @@ package scotty.transformer.impl;
 import org.apache.commons.codec.binary.Base64;
 import org.owasp.webscarab.model.Request;
 
-
 import scotty.crypto.AESEncryption;
 import scotty.crypto.CryptoException;
 import scotty.crypto.KeyManager;
@@ -40,8 +39,8 @@ public class DefaultRequestTransformer implements RequestTransformer {
 			}
 
 			// encrypt request with AES
-			byte[] encryptedRequest = null;
-			encryptedRequest = AESEncryption.encrypt(plainRequest, aesPassword);
+			byte[] encryptedRequest = AESEncryption.encrypt(plainRequest,
+					aesPassword);
 
 			// base64 encode all
 			Base64 base64 = new Base64();

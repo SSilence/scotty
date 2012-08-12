@@ -19,12 +19,14 @@ CHANGELOG
 Version 0.1
 
 
+
 -------
 CREDITS
 -------
 
 Special thanks to the great programmers of this libraries which will be used in scotty:
 
-* Jetty Web Server: http://jetty.codehaus.org/jetty/
-* Apache HttpClient: http://hc.apache.org/httpclient-3.x/
+* WebScarab: https://www.owasp.org/index.php/Category:OWASP_WebScarab_Project
 * Apache Commons CLI: http://commons.apache.org/cli/
+* proxy-vole: http://code.google.com/p/proxy-vole/
+* phpseclib http://phpseclib.sourceforge.net/
