@@ -33,6 +33,10 @@ import scotty.event.EventDispatcher;
 import scotty.event.EventObserver;
 import scotty.event.Events;
 import scotty.plugin.TransformingProxyPlugin;
+import scotty.transformer.RequestTransformer;
+import scotty.transformer.ResponseTransformer;
+import scotty.transformer.impl.DefaultRequestTransformer;
+import scotty.transformer.impl.DefaultResponseTransformer;
 import scotty.ui.SystrayIndicatorProxyPlugin;
 import scotty.ui.SystrayManager;
 import scotty.util.Messages;
@@ -314,7 +318,9 @@ public class Scotty implements EventObserver {
 		Proxy proxy = new Proxy(framework);
 		framework.addPlugin(proxy);
 
-		TransformingProxyPlugin cp = new TransformingProxyPlugin(keyManager, disableEncryption);
+		RequestTransformer requestTransformer = new DefaultRequestTransformer(keyManager, disableEncryption);
+		ResponseTransformer responseTransformer = new DefaultResponseTransformer(keyManager, disableEncryption);
+		TransformingProxyPlugin cp = new TransformingProxyPlugin(requestTransformer, responseTransformer);
 		proxy.addPlugin(cp);
 
 		ProxyPlugin indicator = new SystrayIndicatorProxyPlugin(systray);
