@@ -171,7 +171,7 @@ public class Scotty implements EventObserver {
 	/**
 	 * WebScarab framework.
 	 */
-	private Framework framework = new Framework();
+	private Framework framework;
 
 	private SystrayManager systray = new SystrayManager();
 
@@ -297,6 +297,8 @@ public class Scotty implements EventObserver {
 		systray.setTooltip(msgs.scotty() + " " + gatewayUrl);
 
 		configureProxySettings();
+		framework = new Framework();
+		
 		framework.setSession(null, null, null);
 		Preferences.setPreference("WebScarab.promptForCredentials", "true");
 		CredentialManager cm = framework.getCredentialManager();
