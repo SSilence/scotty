@@ -92,6 +92,7 @@ public class TransformingProxyPlugin extends ProxyPlugin {
 			if (Scotty.useGateway) {
 				response = responseTransformer
 						.transformResponse(cryptedResponse.getContent());
+				response.setRequest(request);
 			} else {
 				response = cryptedResponse;
 			}

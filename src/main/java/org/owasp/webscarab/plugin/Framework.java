@@ -410,13 +410,13 @@ public class Framework {
 		if (!conversation.shouldAnalyse())
 			return;
 		// _analyseConversation.runScripts(conversation);
-		try {
-			this.analysisQueuedExecutor.execute(new QueueProcessor(id));
-			this.analysisLongRunningQueuedExecutor.execute(new QueueProcessor(
-					id, true));
-		} catch (InterruptedException ex) {
-			_logger.severe("error scheduling analysis task: " + ex.getMessage());
-		}
+//		try {
+//			this.analysisQueuedExecutor.execute(new QueueProcessor(id));
+//			this.analysisLongRunningQueuedExecutor.execute(new QueueProcessor(
+//					id, true));
+//		} catch (InterruptedException ex) {
+//			_logger.severe("error scheduling analysis task: " + ex.getMessage());
+//		}
 	}
 
 	public ConversationID addConversation(Request request, Response response,

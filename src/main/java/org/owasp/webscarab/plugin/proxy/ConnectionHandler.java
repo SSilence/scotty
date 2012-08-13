@@ -101,6 +101,9 @@ public class ConnectionHandler implements Runnable {
 				try {
 					request = new Request();
 					request.read(_clientIn);
+					if ( request.getURL() == null) {
+						return;
+					}
 				} catch (IOException ioe) {
 					_logger.severe("Error reading the initial request" + ioe);
 					return;

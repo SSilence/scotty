@@ -8,6 +8,7 @@ import java.net.Proxy.Type;
 import java.net.ProxySelector;
 import java.net.URI;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JFrame;
@@ -60,6 +61,9 @@ import com.btr.proxy.search.ProxySearch;
  * 
  */
 public class Scotty implements EventObserver {
+	
+	
+	
 	private static Logger log = Logger.getLogger(Scotty.class.getName());
 
 	private JFrame parent = new JFrame();
@@ -328,7 +332,7 @@ public class Scotty implements EventObserver {
 		Preferences.setPreference("WebScarab.promptForCredentials", "true");
 		CredentialManager cm = framework.getCredentialManager();
 		CredentialManagerUI credentialRequestDialog = new CredentialRequestDialog(
-				parent, true, cm);
+				null, true, cm);
 		cm.setUI(credentialRequestDialog);
 
 		loadMainPlugin(framework);

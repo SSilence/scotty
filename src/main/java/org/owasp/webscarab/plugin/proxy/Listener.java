@@ -90,8 +90,7 @@ public class Listener implements Runnable {
                 return;
             }
         }
-        if (W32WinInet.isAvailable() && _spec.isPrimaryProxy()) 
-            W32WinInet.interceptProxy("localhost", _spec.getPort());
+
         while (! _stop) {
             try {
                 sock = _serversocket.accept();
