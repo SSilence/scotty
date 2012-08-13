@@ -46,14 +46,15 @@ import com.btr.proxy.search.ProxySearch;
 /**
  * Main class. scotty, transporter of freedom.
  * 
- * Usage: scotty [-g <Gateway-URL>] [-p <Local-Port>] [ -d ] <br />
+ * Usage: scotty [-g <Gateway-URL>] [-p <Local-Port>] [ -d ] [ -proxyHost <proxyHost> -proxyPort <Port> ]<br />
  * <br />
  * CLI Params: <br />
  * <br />
  * -g Gateway-url wg. http://my.gatew.ay/gate.php <br />
  * -p local Port eg. 8008 <br />
  * -d disables gateway usage, no value<br />
- * 
+ * -proxyHost proxy Host (eg. my.pro.xy)
+ * -proxPort proxy Port (eg. 8080)
  * 
  * @author flo
  * 
@@ -98,6 +99,16 @@ public class Scotty implements EventObserver {
 	 */
 	private static final String CREATEKEY_CMDLINE_PARAM = "c";
 
+	/**
+	 * CLI for proxy host
+	 */
+	private static final String PROXY_HOST_CMDLINE_PARAM = "proxyHost";
+	
+	/**
+	 * CLI for proxy port
+	 */
+	private static final String PROXY_PORT_CMDLINE_PARAM = "proxyPort";
+	
 	/**
 	 * CLI for creating a new key pair
 	 */
@@ -177,6 +188,11 @@ public class Scotty implements EventObserver {
 
 	private Messages msgs = new Messages();
 
+	/**
+	 * Set if, proxy-vole should try to autoconfig the proxy. (If cmdline args are not used).
+	 */
+	private boolean autoConfigProxy = true;
+	
 	public Scotty() {
 		EventDispatcher.add(this);
 	}
@@ -270,10 +286,19 @@ public class Scotty implements EventObserver {
 
 		opts.addOption(DONT_USE_GATEWAY, false,
 				"Don't use gateway - direct connection.");
-
+		opts.addOption(PROXY_HOST_CMDLINE_PARAM, true,
+				"Proxy Host");
+		opts.addOption(PROXY_PORT_CMDLINE_PARAM, true,
+				"Proxy Port");		
+		
 		CommandLineParser cmd = new PosixParser();
 		CommandLine line = cmd.parse(opts, args);
-
+		if ( line.hasOption(PROXY_HOST_CMDLINE_PARAM) && line.hasOption(PROXY_PORT_CMDLINE_PARAM)) {
+			setHttpProxy(line.getOptionValue(PROXY_HOST_CMDLINE_PARAM), Integer.valueOf(line.getOptionValue(PROXY_PORT_CMDLINE_PARAM)));
+			setHttpsProxy(line.getOptionValue(PROXY_HOST_CMDLINE_PARAM), Integer.valueOf(line.getOptionValue(PROXY_PORT_CMDLINE_PARAM)));
+			autoConfigProxy = false;
+		}
+		
 		gatewayUrl = line.getOptionValue(GATEWAY_CMDLINE_PARAM,
 				defaultGatewayUrl);
 
@@ -395,6 +420,8 @@ public class Scotty implements EventObserver {
 	 * by utilising proxy-vole.
 	 */
 	public void configureProxySettings() {
+		if ( !autoConfigProxy ) return;
+		
 		try {
 			ProxySearch proxySearch = ProxySearch.getDefaultProxySearch();
 			ProxySelector myProxySelector = proxySearch.getProxySelector();
@@ -409,22 +436,9 @@ public class Scotty implements EventObserver {
 					InetSocketAddress address = (InetSocketAddress) p.address();
 
 					if (Type.HTTP == p.type()) {
-
-						factory.setHttpProxy(address.getHostName(),
-								address.getPort());
-						Preferences
-								.setPreference(
-										"WebScarab.httpProxy",
-										address.getHostName() + ":"
-												+ address.getPort());
+						setHttpProxy(address.getHostName(), address.getPort());
 					} else if (Type.SOCKS == p.type()) {
-						factory.setHttpsProxy(address.getHostName(),
-								address.getPort());
-						Preferences
-								.setPreference(
-										"WebScarab.httpsProxy",
-										address.getHostName() + ":"
-												+ address.getPort());
+						setHttpsProxy(address.getHostName(), address.getPort());
 					}
 				}
 			}
@@ -438,4 +452,16 @@ public class Scotty implements EventObserver {
 
 	}
 
+	public void setHttpProxy(String host, Integer port) {
+		HTTPClientFactory factory = HTTPClientFactory.getInstance();
+		factory.setHttpProxy(host, Integer.valueOf(port));
+		Preferences .setPreference( "WebScarab.httpProxy", host + ":" + port);
+	}
+	
+	public void setHttpsProxy(String host, Integer port) {
+		HTTPClientFactory factory = HTTPClientFactory.getInstance();
+		factory.setHttpsProxy(host, Integer.valueOf(port));
+		Preferences	.setPreference("WebScarab.httpsProxy", host + ":" + port);
+	}
+	
 }
