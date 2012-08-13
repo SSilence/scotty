@@ -54,7 +54,7 @@ import com.btr.proxy.search.ProxySearch;
  * -p local Port eg. 8008 <br />
  * -d disables gateway usage, no value<br />
  * -proxyHost proxy Host (eg. my.pro.xy)
- * -proxPort proxy Port (eg. 8080)
+ * -proxyPort proxy Port (eg. 8080)
  * 
  * @author flo
  * 
