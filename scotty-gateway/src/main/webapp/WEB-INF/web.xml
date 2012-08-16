@@ -4,4 +4,15 @@
 
 <web-app>
   <display-name>Archetype Created Web Application</display-name>
+  
+  
+  <servlet>
+  	<servlet-class>scotty.GatewayServlet</servlet-class>
+  	<servlet-name>gateway</servlet-name>
+  </servlet>
+  
+  <servlet-mapping>
+  	 <servlet-name>gateway</servlet-name>
+  	 <url-pattern>/</url-pattern>
+  </servlet-mapping>
 </web-app>
