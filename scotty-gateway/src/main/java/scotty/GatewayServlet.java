@@ -20,6 +20,8 @@ import scotty.crypto.AESEncryption;
 import scotty.crypto.CryptoException;
 import scotty.crypto.KeyManager;
 import scotty.crypto.RSAEncryption;
+import scotty.fetcher.Fetcher;
+import scotty.fetcher.GoogleFetcher;
 
 
 
@@ -28,6 +30,8 @@ public class GatewayServlet extends HttpServlet {
 	private KeyManager km = new KeyManager();
 
 	private Map<String, Token> keyCache = new ConcurrentHashMap<String, GatewayServlet.Token>();
+
+	private Fetcher fetcher = new GoogleFetcher();
 
 
 
@@ -48,7 +52,7 @@ public class GatewayServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		System.out.println("in doPost()");
-		
+
 		clearCache();
 		Message m = getContent(req);
 
@@ -58,13 +62,18 @@ public class GatewayServlet extends HttpServlet {
 			byte[] encMessage = Base64.decodeBase64(m.getEncryptedMessage());
 			byte[] decodedMessage = AESEncryption.decrypt(encMessage, aesPassword);
 
-			String msg = new String(decodedMessage);
-
 			// parse request, execute request..
+			byte[] response = fetcher.fetch(decodedMessage);
+
+			byte[] cryptedResponse = AESEncryption.encrypt(response, aesPassword);
+
+			resp.getOutputStream().write(cryptedResponse);
 
 		} catch (CryptoException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			resp.flushBuffer();
 		}
 
 	}
