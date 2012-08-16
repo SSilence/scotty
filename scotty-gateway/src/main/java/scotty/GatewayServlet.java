@@ -51,8 +51,6 @@ public class GatewayServlet extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		System.out.println("in doPost()");
-
 		clearCache();
 		Message m = getContent(req);
 
