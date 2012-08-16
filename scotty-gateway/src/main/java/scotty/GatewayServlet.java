@@ -65,9 +65,14 @@ public class GatewayServlet extends HttpServlet {
 			// parse request, execute request..
 			byte[] response = fetcher.fetch(decodedMessage);
 
-			byte[] cryptedResponse = AESEncryption.encrypt(response, aesPassword);
-
-			resp.getOutputStream().write(cryptedResponse);
+			if ( req.getParameter("enc") == null ) {
+				byte[] cryptedResponse = AESEncryption.encrypt(response, aesPassword);
+				resp.getOutputStream().write(Base64.encodeBase64(cryptedResponse));
+				
+			}else {				
+				resp.getOutputStream().write(Base64.encodeBase64(response));
+			}
+			
 
 		} catch (CryptoException e) {
 			// TODO Auto-generated catch block
