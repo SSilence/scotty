@@ -39,17 +39,12 @@
 
 package org.owasp.webscarab.plugin.proxy;
 
-import java.lang.Runnable;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.io.IOException;
-import java.lang.Thread;
-
 import java.util.logging.Logger;
-
-import org.owasp.webscarab.util.W32WinInet;
 
 /**
  * 
