@@ -12,20 +12,12 @@ public class DefaultRequestTransformer implements RequestTransformer {
 
 	private KeyManager keyManager;
 
-	private boolean disableEncryption;
-
-	public DefaultRequestTransformer(KeyManager keyManager,
-			boolean disableEncryption) {
+	public DefaultRequestTransformer(KeyManager keyManager) {
 		this.keyManager = keyManager;
-		this.disableEncryption = disableEncryption;
 	}
 
 	@Override
 	public byte[] transformRequest(Request request) {
-		// is encryption disabled?
-		if (disableEncryption)
-			return request.toString().getBytes();
-
 		try {
 			// content as byte array
 			byte[] plainRequest = request.toString().getBytes();

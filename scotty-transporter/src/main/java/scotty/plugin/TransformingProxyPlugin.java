@@ -31,11 +31,12 @@ public class TransformingProxyPlugin extends ProxyPlugin {
 
 	private UserAgentProvider uaProvider = new UserAgentProvider();
 
-	public TransformingProxyPlugin(RequestTransformer requestTransformer, ResponseTransformer responseTransformer) {
+	public TransformingProxyPlugin(RequestTransformer requestTransformer,
+			ResponseTransformer responseTransformer) {
 		this.requestTransformer = requestTransformer;
 		this.responseTransformer = responseTransformer;
 	}
-	
+
 	@Override
 	public String getPluginName() {
 		return "TransformingProxyPlugin";
@@ -60,42 +61,35 @@ public class TransformingProxyPlugin extends ProxyPlugin {
 			byte[] cryptedRequest = requestTransformer
 					.transformRequest(request);
 
-			if (Scotty.useGateway) {
-				// Build request, which will be sent to the gateway:
-				HttpUrl url = request.getURL();
-				request = new Request();
-				request.setContent(cryptedRequest);
+			// Build request, which will be sent to the gateway:
+			HttpUrl url = request.getURL();
+			request = new Request();
+			request.setContent(cryptedRequest);
 
-				HttpUrl gateway = new HttpUrl(Scotty.gatewayUrl);
-				request.setHeader("Host", gateway.getHost());
-				request.setHeader("Accept-Charset",
-						"ISO-8859-1,utf-8;q=0.7,*;q=0.3");
-				request.setHeader("Accept-Encoding", "deflate");
-				request.setHeader("Accept-Language",
-						"de-DE,de;q=0.8,en-US;q=0.6,en;q=0.4");
-				request.setHeader("Content-Length",
-						Integer.toString(cryptedRequest.length));
-				request.setHeader("User-Agent", uaProvider.getUserAgent());
+			HttpUrl gateway = new HttpUrl(Scotty.gatewayUrl);
+			request.setHeader("Host", gateway.getHost());
+			request.setHeader("Accept-Charset",
+					"ISO-8859-1,utf-8;q=0.7,*;q=0.3");
+			request.setHeader("Accept-Encoding", "deflate");
+			request.setHeader("Accept-Language",
+					"de-DE,de;q=0.8,en-US;q=0.6,en;q=0.4");
+			request.setHeader("Content-Length",
+					Integer.toString(cryptedRequest.length));
+			request.setHeader("User-Agent", uaProvider.getUserAgent());
 
-				request.setMethod("POST");
+			request.setMethod("POST");
 
-				if ("https".equalsIgnoreCase(url.getScheme())) {
-					request.setURL(new HttpUrl(Scotty.gatewayUrl + "?ssl=true"));
-				} else {
-					request.setURL(gateway);
-				}
-
+			if ("https".equalsIgnoreCase(url.getScheme())) {
+				request.setURL(new HttpUrl(Scotty.gatewayUrl + "?ssl=true"));
+			} else {
+				request.setURL(gateway);
 			}
 
 			Response cryptedResponse = in.fetchResponse(request);
 
-			if (Scotty.useGateway) {
-				response = responseTransformer
-						.transformResponse(cryptedResponse.getContent());
-				response.setRequest(request);
-			} else {
-				response = cryptedResponse;
-			}
+			response = responseTransformer.transformResponse(cryptedResponse
+					.getContent());
+			response.setRequest(request);
 
 			return response;
 		}

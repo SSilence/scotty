@@ -8,7 +8,6 @@ import java.net.Proxy.Type;
 import java.net.ProxySelector;
 import java.net.URI;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JFrame;
@@ -33,9 +32,12 @@ import scotty.crypto.KeyManager;
 import scotty.event.EventDispatcher;
 import scotty.event.EventObserver;
 import scotty.event.Events;
+import scotty.plugin.NopProxyPlugin;
 import scotty.plugin.TransformingProxyPlugin;
 import scotty.transformer.RequestTransformer;
 import scotty.transformer.ResponseTransformer;
+import scotty.transformer.cleartext.ClearTextRequestTransformer;
+import scotty.transformer.cleartext.ClearTextResponseTransformer;
 import scotty.transformer.impl.DefaultRequestTransformer;
 import scotty.transformer.impl.DefaultResponseTransformer;
 import scotty.ui.SystrayIndicatorProxyPlugin;
@@ -47,23 +49,21 @@ import com.btr.proxy.search.ProxySearch;
 /**
  * Main class. scotty, transporter of freedom.
  * 
- * Usage: scotty [-g <Gateway-URL>] [-p <Local-Port>] [ -d ] [ -proxyHost <proxyHost> -proxyPort <Port> ]<br />
+ * Usage: scotty [-g <Gateway-URL>] [-p <Local-Port>] [ -d ] [ -proxyHost
+ * <proxyHost> -proxyPort <Port> ]<br />
  * <br />
  * CLI Params: <br />
  * <br />
  * -g Gateway-url wg. http://my.gatew.ay/gate.php <br />
  * -p local Port eg. 8008 <br />
  * -d disables gateway usage, no value<br />
- * -proxyHost proxy Host (eg. my.pro.xy)
- * -proxyPort proxy Port (eg. 8080)
+ * -proxyHost proxy Host (eg. my.pro.xy) -proxyPort proxy Port (eg. 8080)
  * 
  * @author flo
  * 
  */
 public class Scotty implements EventObserver {
-	
-	
-	
+
 	private static Logger log = Logger.getLogger(Scotty.class.getName());
 
 	private JFrame parent = new JFrame();
@@ -107,12 +107,12 @@ public class Scotty implements EventObserver {
 	 * CLI for proxy host
 	 */
 	private static final String PROXY_HOST_CMDLINE_PARAM = "proxyHost";
-	
+
 	/**
 	 * CLI for proxy port
 	 */
 	private static final String PROXY_PORT_CMDLINE_PARAM = "proxyPort";
-	
+
 	/**
 	 * CLI for creating a new key pair
 	 */
@@ -193,10 +193,11 @@ public class Scotty implements EventObserver {
 	private Messages msgs = new Messages();
 
 	/**
-	 * Set if, proxy-vole should try to autoconfig the proxy. (If cmdline args are not used).
+	 * Set if, proxy-vole should try to autoconfig the proxy. (If cmdline args
+	 * are not used).
 	 */
 	private boolean autoConfigProxy = true;
-	
+
 	public Scotty() {
 		EventDispatcher.add(this);
 	}
@@ -290,19 +291,22 @@ public class Scotty implements EventObserver {
 
 		opts.addOption(DONT_USE_GATEWAY, false,
 				"Don't use gateway - direct connection.");
-		opts.addOption(PROXY_HOST_CMDLINE_PARAM, true,
-				"Proxy Host");
-		opts.addOption(PROXY_PORT_CMDLINE_PARAM, true,
-				"Proxy Port");		
-		
+		opts.addOption(PROXY_HOST_CMDLINE_PARAM, true, "Proxy Host");
+		opts.addOption(PROXY_PORT_CMDLINE_PARAM, true, "Proxy Port");
+
 		CommandLineParser cmd = new PosixParser();
 		CommandLine line = cmd.parse(opts, args);
-		if ( line.hasOption(PROXY_HOST_CMDLINE_PARAM) && line.hasOption(PROXY_PORT_CMDLINE_PARAM)) {
-			setHttpProxy(line.getOptionValue(PROXY_HOST_CMDLINE_PARAM), Integer.valueOf(line.getOptionValue(PROXY_PORT_CMDLINE_PARAM)));
-			setHttpsProxy(line.getOptionValue(PROXY_HOST_CMDLINE_PARAM), Integer.valueOf(line.getOptionValue(PROXY_PORT_CMDLINE_PARAM)));
+		if (line.hasOption(PROXY_HOST_CMDLINE_PARAM)
+				&& line.hasOption(PROXY_PORT_CMDLINE_PARAM)) {
+			setHttpProxy(line.getOptionValue(PROXY_HOST_CMDLINE_PARAM),
+					Integer.valueOf(line
+							.getOptionValue(PROXY_PORT_CMDLINE_PARAM)));
+			setHttpsProxy(line.getOptionValue(PROXY_HOST_CMDLINE_PARAM),
+					Integer.valueOf(line
+							.getOptionValue(PROXY_PORT_CMDLINE_PARAM)));
 			autoConfigProxy = false;
 		}
-		
+
 		gatewayUrl = line.getOptionValue(GATEWAY_CMDLINE_PARAM,
 				defaultGatewayUrl);
 
@@ -327,7 +331,7 @@ public class Scotty implements EventObserver {
 
 		configureProxySettings();
 		framework = new Framework();
-		
+
 		framework.setSession(null, null, null);
 		Preferences.setPreference("WebScarab.promptForCredentials", "true");
 		CredentialManager cm = framework.getCredentialManager();
@@ -351,10 +355,8 @@ public class Scotty implements EventObserver {
 		Proxy proxy = new Proxy(framework);
 		framework.addPlugin(proxy);
 
-		RequestTransformer requestTransformer = new DefaultRequestTransformer(keyManager, disableEncryption);
-		ResponseTransformer responseTransformer = new DefaultResponseTransformer(keyManager, disableEncryption);
-		TransformingProxyPlugin cp = new TransformingProxyPlugin(requestTransformer, responseTransformer);
-		proxy.addPlugin(cp);
+		ProxyPlugin proxyPlugin = createProxyPlugin(useGateway);
+		proxy.addPlugin(proxyPlugin);
 
 		ProxyPlugin indicator = new SystrayIndicatorProxyPlugin(systray);
 		proxy.addPlugin(indicator);
@@ -362,6 +364,35 @@ public class Scotty implements EventObserver {
 		for (ListenerSpec spec : proxy.getProxies()) {
 			proxy.addListener(spec);
 		}
+	}
+
+	public ProxyPlugin createProxyPlugin(boolean useGateway) {
+		ProxyPlugin cp = null;
+		if (useGateway) {
+			RequestTransformer requestTransformer = createRequestTransformer(disableEncryption);
+			ResponseTransformer responseTransformer = createResponseTransformer(disableEncryption);
+			cp = new TransformingProxyPlugin(requestTransformer,
+					responseTransformer);
+		} else {
+			cp = new NopProxyPlugin();
+		}
+
+		return cp;
+	}
+
+	public RequestTransformer createRequestTransformer(boolean disableEncryption) {
+		if (disableEncryption) {
+			return new ClearTextRequestTransformer();
+		}
+		return new DefaultRequestTransformer(keyManager);
+	}
+
+	public ResponseTransformer createResponseTransformer(
+			boolean disableEncryption) {
+		if (disableEncryption) {
+			return new ClearTextResponseTransformer();
+		}
+		return new DefaultResponseTransformer(keyManager);
 	}
 
 	/**
@@ -424,8 +455,9 @@ public class Scotty implements EventObserver {
 	 * by utilising proxy-vole.
 	 */
 	public void configureProxySettings() {
-		if ( !autoConfigProxy ) return;
-		
+		if (!autoConfigProxy)
+			return;
+
 		try {
 			ProxySearch proxySearch = ProxySearch.getDefaultProxySearch();
 			ProxySelector myProxySelector = proxySearch.getProxySelector();
@@ -459,13 +491,13 @@ public class Scotty implements EventObserver {
 	public void setHttpProxy(String host, Integer port) {
 		HTTPClientFactory factory = HTTPClientFactory.getInstance();
 		factory.setHttpProxy(host, Integer.valueOf(port));
-		Preferences .setPreference( "WebScarab.httpProxy", host + ":" + port);
+		Preferences.setPreference("WebScarab.httpProxy", host + ":" + port);
 	}
-	
+
 	public void setHttpsProxy(String host, Integer port) {
 		HTTPClientFactory factory = HTTPClientFactory.getInstance();
 		factory.setHttpsProxy(host, Integer.valueOf(port));
-		Preferences	.setPreference("WebScarab.httpsProxy", host + ":" + port);
+		Preferences.setPreference("WebScarab.httpsProxy", host + ":" + port);
 	}
-	
+
 }
