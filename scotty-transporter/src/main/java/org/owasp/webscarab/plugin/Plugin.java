@@ -39,10 +39,6 @@
 
 package org.owasp.webscarab.plugin;
 
-import org.owasp.webscarab.model.ConversationID;
-import org.owasp.webscarab.model.Request;
-import org.owasp.webscarab.model.Response;
-
 /**
  * This abstract class lists the basics that a WebScarab plugin will need to
  * provide

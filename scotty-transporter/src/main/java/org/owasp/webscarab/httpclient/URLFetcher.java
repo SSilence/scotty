@@ -555,89 +555,11 @@ public class URLFetcher implements HTTPClient {
 
 	private String constructAuthenticationHeader(String[] challenges,
 			String credentials) {
-		/*
-		 * credentials string looks like: Basic BASE64(username:password) or
-		 * NTLM BASE64(domain\ username:password)
-		 */
-		// _logger.info("Constructing auth header from " + credentials);
 		if (credentials == null)
 			return null;
 		if (credentials.startsWith("Basic")) {
 			return credentials;
 		}
-		if (challenges != null) {
-			for (int i = 0; i < challenges.length; i++) {
-				_logger.fine("Challenge: " + challenges[i]);
-				if (challenges[i].startsWith("NTLM")
-						&& credentials.startsWith("NTLM")) {
-					return attemptNegotiation(challenges[i], credentials);
-				}
-				if (challenges[i].startsWith("Negotiate")
-						&& credentials.startsWith("Negotiate")) {
-					_logger.fine("Attempting 'Negotiate' Authentication");
-					return attemptNegotiation(challenges[i], credentials);
-				}
-				_logger.info("Can't do auth for " + challenges[i]);
-			}
-		}
-		return null;
-	}
-
-	// We dont support NTLM.
-	private String attemptNegotiation(String challenge, String credentials) {
-		// String authMethod = null;
-		// String authorization = null;
-		// if (challenge.startsWith("NTLM")) {
-		// if (challenge.length() == 4) {
-		// authMethod = "NTLM";
-		// }
-		// if (challenge.indexOf(' ') == 4) {
-		// authMethod = "NTLM";
-		// authorization = challenge.substring(5).trim();
-		// }
-		// } else if (challenge.startsWith("Negotiate")) {
-		// if (challenge.length() == 9) {
-		// authMethod = "Negotiate";
-		// }
-		// if (challenge.indexOf(' ') == 9) {
-		// authMethod = "Negotiate";
-		// authorization = challenge.substring(10).trim();
-		// }
-		// }
-		// if (authMethod == null) return null;
-		// NtlmMessage message = null;
-		// if (authorization != null) {
-		// try {
-		// message = new Type2Message(Base64.decode(authorization));
-		// } catch (IOException ioe) {
-		// ioe.printStackTrace();
-		// return null;
-		// }
-		// }
-		// // reconnect();
-		// int flags = NtlmFlags.NTLMSSP_NEGOTIATE_NTLM2 |
-		// NtlmFlags.NTLMSSP_NEGOTIATE_ALWAYS_SIGN |
-		// NtlmFlags.NTLMSSP_NEGOTIATE_NTLM | NtlmFlags.NTLMSSP_REQUEST_TARGET |
-		// NtlmFlags.NTLMSSP_NEGOTIATE_OEM |
-		// NtlmFlags.NTLMSSP_NEGOTIATE_UNICODE;
-		// if (message == null) {
-		// message = new Type1Message(flags, null, null);
-		// } else {
-		// credentials = credentials.substring(authMethod.length()+1); // strip
-		// off the "NTLM " or "Negotiate "
-		// credentials = new String(Base64.decode(credentials)); // decode the
-		// base64
-		// String domain = credentials.substring(0, credentials.indexOf("\\"));
-		// String user = credentials.substring(domain.length()+1,
-		// credentials.indexOf(":"));
-		// String password =
-		// credentials.substring(domain.length()+user.length()+2);
-		// Type2Message type2 = (Type2Message) message;
-		// flags ^= NtlmFlags.NTLMSSP_NEGOTIATE_OEM;
-		// message = new Type3Message(type2, password, domain, user, null,
-		// flags);
-		// }
-		// return authMethod + " " + Base64.encode(message.toByteArray());
 		return null;
 	}
 

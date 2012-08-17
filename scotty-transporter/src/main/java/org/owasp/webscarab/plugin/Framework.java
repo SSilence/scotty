@@ -41,13 +41,9 @@ package org.owasp.webscarab.plugin;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import org.owasp.webscarab.httpclient.HTTPClientFactory;
-import org.owasp.webscarab.model.FrameworkModel;
 import org.owasp.webscarab.model.Preferences;
 
 /**
@@ -59,8 +55,6 @@ public class Framework {
 
 	private ArrayList<Plugin> _plugins = new ArrayList<Plugin>();
 
-	private FrameworkModel _model;
-
 	private Logger _logger = Logger.getLogger(getClass().getName());
 
 	// private ScriptManager _scriptManager;
@@ -70,24 +64,12 @@ public class Framework {
 	 * Creates a new instance of Framework
 	 */
 	public Framework() {
-		_model = new FrameworkModel();
-
 		_credentialManager = new CredentialManager();
 		configureHTTPClient();
-
 	}
 
 	public CredentialManager getCredentialManager() {
 		return _credentialManager;
-	}
-
-	/**
-	 * provided to allow plugins to gain access to the model.
-	 * 
-	 * @return the SiteModel
-	 */
-	public FrameworkModel getModel() {
-		return _model;
 	}
 
 	/**
@@ -155,28 +137,6 @@ public class Framework {
 				return true;
 		}
 		return false;
-	}
-
-	public boolean isModified() {
-		if (_model.isModified())
-			return true;
-		Iterator<Plugin> it = _plugins.iterator();
-		while (it.hasNext()) {
-			Plugin plugin = it.next();
-			if (plugin.isModified())
-				return true;
-		}
-		return false;
-	}
-
-	public String[] getStatus() {
-		List<String> status = new ArrayList<String>();
-		Iterator<Plugin> it = _plugins.iterator();
-		while (it.hasNext()) {
-			Plugin plugin = it.next();
-			status.add(plugin.getPluginName() + " : " + plugin.getStatus());
-		}
-		return status.toArray(new String[0]);
 	}
 
 	/**

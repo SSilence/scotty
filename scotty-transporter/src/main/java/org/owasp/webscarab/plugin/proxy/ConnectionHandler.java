@@ -45,7 +45,6 @@ import javax.net.ssl.SSLSocketFactory;
 
 import org.owasp.webscarab.httpclient.HTTPClient;
 import org.owasp.webscarab.httpclient.HTTPClientFactory;
-import org.owasp.webscarab.model.ConversationID;
 import org.owasp.webscarab.model.HttpUrl;
 import org.owasp.webscarab.model.Request;
 import org.owasp.webscarab.model.Response;
@@ -94,7 +93,7 @@ public class ConnectionHandler implements Runnable {
 					+ ioe);
 			return;
 		}
-		ConversationID id = null;
+
 		try {
 			Request request = null;
 			// if we do not already have a base URL (i.e. we operate as a normal
@@ -180,7 +179,6 @@ public class ConnectionHandler implements Runnable {
 			String version = null;
 
 			do {
-				id = null;
 				// if we are reading the first from a reverse proxy, or the
 				// continuation of a CONNECT from a normal proxy
 				// read the request, otherwise we already have it.
@@ -215,7 +213,7 @@ public class ConnectionHandler implements Runnable {
 				if (request == null)
 					throw new IOException("Request was cancelled");
 				if (response != null) {
-					_proxy.failedResponse(id, "Response provided by script");
+					_proxy.failedResponse("Response provided by script");
 					_proxy = null;
 				} else {
 
@@ -232,12 +230,12 @@ public class ConnectionHandler implements Runnable {
 						response = errorResponse(request, ioe);
 						// prevent the conversation from being
 						// submitted/recorded
-						_proxy.failedResponse(id, ioe.toString());
+						_proxy.failedResponse(ioe.toString());
 						_proxy = null;
 					}
 					if (response == null) {
 						_logger.severe("Got a null response from the fetcher");
-						_proxy.failedResponse(id, "Null response");
+						_proxy.failedResponse("Null response");
 						return;
 					}
 				}

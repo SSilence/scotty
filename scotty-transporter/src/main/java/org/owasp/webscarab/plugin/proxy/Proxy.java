@@ -54,7 +54,6 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 
-import org.owasp.webscarab.model.ConversationID;
 import org.owasp.webscarab.model.HttpUrl;
 import org.owasp.webscarab.model.Preferences;
 import org.owasp.webscarab.plugin.Framework;
@@ -410,7 +409,7 @@ public class Proxy implements Plugin {
 	 * @param id
 	 *            the conversation ID
 	 */
-	protected void failedResponse(ConversationID id, String reason) {
+	protected void failedResponse(String reason) {
 		_pending--;
 		_status = "Started, "
 				+ (_pending > 0 ? (_pending + " in progress") : "Idle");
