@@ -332,7 +332,6 @@ public class Scotty implements EventObserver {
 		configureProxySettings();
 		framework = new Framework();
 
-		framework.setSession(null, null, null);
 		Preferences.setPreference("WebScarab.promptForCredentials", "true");
 		CredentialManager cm = framework.getCredentialManager();
 		CredentialManagerUI credentialRequestDialog = new CredentialRequestDialog(

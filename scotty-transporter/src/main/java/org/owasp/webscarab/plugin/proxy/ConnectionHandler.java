@@ -65,6 +65,8 @@ public class ConnectionHandler implements Runnable {
 	private InputStream _clientIn = null;
 	private OutputStream _clientOut = null;
 
+	private int socketTimeout = 30 * 1000;
+
 	public ConnectionHandler(Proxy proxy, Socket sock, HttpUrl base) {
 		_proxy = proxy;
 		_sock = sock;
@@ -72,15 +74,15 @@ public class ConnectionHandler implements Runnable {
 		_plugins = _proxy.getPlugins();
 		try {
 			_sock.setTcpNoDelay(true);
-			_sock.setSoTimeout(30 * 1000);
+			_sock.setSoTimeout(socketTimeout);
 		} catch (SocketException se) {
 			_logger.warning("Error setting socket parameters");
 		}
 	}
 
 	public void run() {
-		ScriptableConnection connection = new ScriptableConnection(_sock);
-		_proxy.allowClientConnection(connection);
+		Connection connection = new Connection(_sock);
+
 		if (_sock.isClosed())
 			return;
 
@@ -101,7 +103,7 @@ public class ConnectionHandler implements Runnable {
 				try {
 					request = new Request();
 					request.read(_clientIn);
-					if ( request.getURL() == null) {
+					if (request.getURL() == null) {
 						return;
 					}
 				} catch (IOException ioe) {
@@ -128,9 +130,8 @@ public class ConnectionHandler implements Runnable {
 									.getBytes());
 							_clientOut.flush();
 						} catch (IOException ioe) {
-							_logger
-									.severe("IOException writing the CONNECT OK Response to the browser "
-											+ ioe);
+							_logger.severe("IOException writing the CONNECT OK Response to the browser "
+									+ ioe);
 							return;
 						}
 					}
@@ -198,18 +199,16 @@ public class ConnectionHandler implements Runnable {
 					request.addHeader("X-Forwarded-For", from);
 				}
 				try {
-				_logger.fine("Browser requested : " + request.getMethod() + " "
-						+ request.getURL().toString());
+					_logger.fine("Browser requested : " + request.getMethod()
+							+ " " + request.getURL().toString());
 				} catch (NullPointerException npe) {
 					System.out.println("Request is: " + request);
 				}
-				// report the request to the listener, and get the allocated ID
-				id = _proxy.gotRequest(request);
 
 				// pass the request for possible modification or analysis
 				connection.setRequest(request);
 				connection.setResponse(null);
-				_proxy.interceptRequest(connection);
+
 				request = connection.getRequest();
 				Response response = connection.getResponse();
 
@@ -227,9 +226,8 @@ public class ConnectionHandler implements Runnable {
 						if (response.getRequest() != null)
 							request = response.getRequest();
 					} catch (IOException ioe) {
-						_logger
-								.severe("IOException retrieving the response for "
-										+ request.getURL() + " : " + ioe);
+						_logger.severe("IOException retrieving the response for "
+								+ request.getURL() + " : " + ioe);
 						ioe.printStackTrace();
 						response = errorResponse(request, ioe);
 						// prevent the conversation from being
@@ -248,7 +246,7 @@ public class ConnectionHandler implements Runnable {
 					// pass the response for analysis or modification by the
 					// scripts
 					connection.setResponse(response);
-					_proxy.interceptResponse(connection);
+
 					response = connection.getResponse();
 				}
 
@@ -259,13 +257,10 @@ public class ConnectionHandler implements Runnable {
 					if (_clientOut != null) {
 						_logger.fine("Writing the response to the browser");
 						response.write(_clientOut);
-						_logger
-								.fine("Finished writing the response to the browser");
+						_logger.fine("Finished writing the response to the browser");
 					}
 				} catch (IOException ioe) {
-					_logger
-							.severe("Error writing back to the browser : "
-									+ ioe);
+					_logger.severe("Error writing back to the browser : " + ioe);
 				} finally {
 					response.flushContentStream(); // this simply flushes the
 													// content from the server
@@ -275,9 +270,6 @@ public class ConnectionHandler implements Runnable {
 				if (response.getRequest() == null) {
 					_logger.warning("Response had no associated request!");
 					response.setRequest(request);
-				}
-				if (_proxy != null && !request.getMethod().equals("CONNECT")) {
-					_proxy.gotResponse(id, response);
 				}
 
 				keepAlive = response.getHeader("Connection");
@@ -293,8 +285,6 @@ public class ConnectionHandler implements Runnable {
 							.equalsIgnoreCase(keepAlive)));
 			_logger.fine("Finished handling connection");
 		} catch (Exception e) {
-			if (id != null)
-				_proxy.failedResponse(id, e.getMessage());
 			_logger.severe("ConnectionHandler got an error : " + e);
 			e.printStackTrace();
 		} finally {
@@ -311,7 +301,6 @@ public class ConnectionHandler implements Runnable {
 			}
 		}
 	}
-
 
 	private Socket negotiateSSL(Socket sock, String host) throws Exception {
 		SSLSocketFactory factory = _proxy.getSocketFactory(host);

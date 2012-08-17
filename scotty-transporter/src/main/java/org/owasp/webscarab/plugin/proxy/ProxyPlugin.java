@@ -42,22 +42,18 @@ package org.owasp.webscarab.plugin.proxy;
 import org.owasp.webscarab.httpclient.HTTPClient;
 
 /**
- *
- * @author  rdawes
+ * 
+ * @author rdawes
  */
 public abstract class ProxyPlugin {
-    
-    public void setSession(String type, Object store, String session)  {
-    }
-    
-    public void flush() {
-    }
-    
-    /** The plugin name
-     * @return The name of the plugin
-     */
-    public abstract String getPluginName();
-    
-    public abstract HTTPClient getProxyPlugin(HTTPClient in);
-    
+
+	/**
+	 * The plugin name
+	 * 
+	 * @return The name of the plugin
+	 */
+	public abstract String getPluginName();
+
+	public abstract HTTPClient getProxyPlugin(HTTPClient in);
+
 }

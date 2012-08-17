@@ -18,7 +18,7 @@ import org.owasp.webscarab.model.Response;
  * the request that the browser submits, and the response that is returned.
  * @author rogan
  */
-public class ScriptableConnection {
+public class Connection {
     
     private Socket _socket = null;
     
@@ -26,7 +26,7 @@ public class ScriptableConnection {
     private Response _response = null;
     
     /** Creates a new instance of Connection */
-    public ScriptableConnection(Socket socket) {
+    public Connection(Socket socket) {
         _socket = socket;
     }
     

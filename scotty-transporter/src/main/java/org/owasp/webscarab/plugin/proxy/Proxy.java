@@ -57,11 +57,7 @@ import javax.net.ssl.SSLSocketFactory;
 import org.owasp.webscarab.model.ConversationID;
 import org.owasp.webscarab.model.HttpUrl;
 import org.owasp.webscarab.model.Preferences;
-import org.owasp.webscarab.model.Request;
-import org.owasp.webscarab.model.Response;
-import org.owasp.webscarab.model.StoreException;
 import org.owasp.webscarab.plugin.Framework;
-import org.owasp.webscarab.plugin.Hook;
 import org.owasp.webscarab.plugin.Plugin;
 
 /**
@@ -74,8 +70,6 @@ public class Proxy implements Plugin {
 	private boolean _running = false;
 
 	private Framework _framework = null;
-
-	private ProxyUI _ui = null;
 
 	private ArrayList<ProxyPlugin> _plugins = new ArrayList<ProxyPlugin>();
 	private TreeMap<ListenerSpec, Listener> _listeners = new TreeMap<ListenerSpec, Listener>();
@@ -91,22 +85,6 @@ public class Proxy implements Plugin {
 	private static char[] _keypassword = "password".toCharArray();
 	private SSLSocketFactoryFactory _certGenerator = null;
 	private static String _certDir = "./certs/";
-
-	private Proxy.ConnectionHook _allowConnection = new ConnectionHook(
-			"Allow connection",
-			"Called when a new connection is received from a browser\n"
-					+ "use connection.getAddress() and connection.closeConnection() to decide and react");
-
-	private Proxy.ConnectionHook _interceptRequest = new ConnectionHook(
-			"Intercept request",
-			"Called when a new request has been submitted by the browser\n"
-					+ "use connection.getRequest() and connection.setRequest(request) to perform changes");
-
-	private Proxy.ConnectionHook _interceptResponse = new ConnectionHook(
-			"Intercept response",
-			"Called when the request has been submitted to the server, and the response "
-					+ "has been recieved.\n"
-					+ "use connection.getResponse() and connection.setResponse(response) to perform changes");
 
 	/**
 	 * Creates a Proxy Object with a reference to the Framework. Creates (but
@@ -133,42 +111,8 @@ public class Proxy implements Plugin {
 		}
 	}
 
-	public Hook[] getScriptingHooks() {
-		return new Hook[] { _allowConnection, _interceptRequest,
-				_interceptResponse };
-	}
-
 	public Object getScriptableObject() {
 		return null;
-	}
-
-	/**
-	 * called by Listener to determine whether to allow a connection or not
-	 */
-	void allowClientConnection(ScriptableConnection connection) {
-		_allowConnection.runScripts(connection);
-	}
-
-	/**
-	 * called by Connectionhandler via Listener to perform any required
-	 * modifications to the Request
-	 */
-	void interceptRequest(ScriptableConnection connection) {
-		_interceptRequest.runScripts(connection);
-	}
-
-	/**
-	 * called by Connectionhandler via Listener to perform any required
-	 * modifications to the Response
-	 */
-	void interceptResponse(ScriptableConnection connection) {
-		_interceptResponse.runScripts(connection);
-	}
-
-	public void setUI(ProxyUI ui) {
-		_ui = ui;
-		if (_ui != null)
-			_ui.setEnabled(_running);
 	}
 
 	public void addPlugin(ProxyPlugin plugin) {
@@ -244,10 +188,10 @@ public class Proxy implements Plugin {
 		startListener(_listeners.get(spec));
 
 		String key = getKey(spec);
-		Preferences.setPreference("Proxy.listener." + key + ".base", spec
-				.getBase() == null ? "" : spec.getBase().toString());
-		Preferences.setPreference("Proxy.listener." + key + ".primary", spec
-				.isPrimaryProxy() == true ? "yes" : "no");
+		Preferences.setPreference("Proxy.listener." + key + ".base",
+				spec.getBase() == null ? "" : spec.getBase().toString());
+		Preferences.setPreference("Proxy.listener." + key + ".primary",
+				spec.isPrimaryProxy() == true ? "yes" : "no");
 
 		String value = null;
 		Iterator<ListenerSpec> i = _listeners.keySet().iterator();
@@ -270,14 +214,10 @@ public class Proxy implements Plugin {
 		Thread t = new Thread(l, "Listener-" + getKey(l.getListenerSpec()));
 		t.setDaemon(true);
 		t.start();
-		if (_ui != null)
-			_ui.proxyStarted(l.getListenerSpec());
 	}
 
 	private boolean stopListener(Listener l) {
 		boolean stopped = l.stop();
-		if (stopped && _ui != null)
-			_ui.proxyStopped(l.getListenerSpec());
 		return stopped;
 	}
 
@@ -294,8 +234,7 @@ public class Proxy implements Plugin {
 			return false;
 		if (stopListener(l)) {
 			_listeners.remove(spec);
-			if (_ui != null)
-				_ui.proxyRemoved(spec);
+
 			String key = getKey(spec);
 			Preferences.remove("Proxy.listener." + key + ".base");
 			Preferences.remove("Proxy.listener." + key + ".simulator");
@@ -337,14 +276,11 @@ public class Proxy implements Plugin {
 				startListener(l);
 			} catch (IOException ioe) {
 				_logger.warning("Unable to start listener " + spec);
-				if (_ui != null)
-					_ui.proxyStartError(spec, ioe);
+
 				removeListener(spec);
 			}
 		}
 		_running = true;
-		if (_ui != null)
-			_ui.setEnabled(_running);
 		_status = "Started, Idle";
 	}
 
@@ -360,53 +296,12 @@ public class Proxy implements Plugin {
 			ListenerSpec spec = it.next();
 			Listener l = _listeners.get(spec);
 			if (l != null && !stopListener(l)) {
-				_logger
-						.severe("Failed to stop Listener-"
-								+ l.getListenerSpec());
+				_logger.severe("Failed to stop Listener-" + l.getListenerSpec());
 				_running = true;
 			}
 		}
-		if (_ui != null)
-			_ui.setEnabled(_running);
 		_status = "Stopped";
 		return !_running;
-	}
-
-	/**
-	 * used by ConnectionHandler to notify the Proxy (and any listeners) that it
-	 * is handling a particular request
-	 * 
-	 * @param request
-	 *            the request to log
-	 * @return the conversation ID
-	 */
-	protected ConversationID gotRequest(Request request) {
-		ConversationID id = _framework.reserveConversationID();
-		if (_ui != null)
-			_ui.requested(id, request.getMethod(), request.getURL());
-		_pending++;
-		_status = "Started, " + _pending + " in progress";
-		return id;
-	}
-
-	/**
-	 * used by ConnectionHandler to notify the Proxy (and any listeners) that it
-	 * has handled a particular request and response, and that it should be
-	 * logged and analysed
-	 * 
-	 * @param id
-	 *            the Conversation ID
-	 * @param response
-	 *            the Response
-	 */
-	protected void gotResponse(ConversationID id, Response response) {
-		if (_ui != null)
-			_ui.received(id, response.getStatusLine());
-		_framework.addConversation(id, response.getRequest(), response,
-				getPluginName());
-		_pending--;
-		_status = "Started, "
-				+ (_pending > 0 ? (_pending + " in progress") : "Idle");
 	}
 
 	protected SSLSocketFactory getSocketFactory(String host) {
@@ -445,8 +340,7 @@ public class Proxy implements Plugin {
 			InputStream is = getClass().getClassLoader().getResourceAsStream(
 					"server.p12");
 			if (is == null) {
-				_logger
-						.severe("WebScarab JAR was built without a certificate!");
+				_logger.severe("WebScarab JAR was built without a certificate!");
 				_logger.severe("SSL Intercept not available!");
 				return null;
 			}
@@ -517,8 +411,6 @@ public class Proxy implements Plugin {
 	 *            the conversation ID
 	 */
 	protected void failedResponse(ConversationID id, String reason) {
-		if (_ui != null)
-			_ui.aborted(id, reason);
 		_pending--;
 		_status = "Started, "
 				+ (_pending > 0 ? (_pending + " in progress") : "Idle");
@@ -576,17 +468,6 @@ public class Proxy implements Plugin {
 
 		_listeners.put(spec, l);
 
-		if (_ui != null)
-			_ui.proxyAdded(spec);
-	}
-
-	public void flush() throws StoreException {
-		// we do not run our own store, but our plugins might
-		Iterator<ProxyPlugin> it = _plugins.iterator();
-		while (it.hasNext()) {
-			ProxyPlugin plugin = it.next();
-			plugin.flush();
-		}
 	}
 
 	public boolean isBusy() {
@@ -601,48 +482,8 @@ public class Proxy implements Plugin {
 		return false;
 	}
 
-	public void analyse(ConversationID id, Request request, Response response,
-			String origin) {
-		// we do no analysis
-	}
-
-	public void setSession(String type, Object store, String session)
-			throws StoreException {
-		// we have no listeners to remove
-		Iterator<ProxyPlugin> it = _plugins.iterator();
-		while (it.hasNext()) {
-			ProxyPlugin plugin = it.next();
-			plugin.setSession(type, store, session);
-		}
-	}
-
 	public boolean isRunning() {
 		return _running;
-	}
-
-	private class ConnectionHook extends Hook {
-
-		public ConnectionHook(String name, String description) {
-			super(name, description);
-		}
-
-		public void runScripts(ScriptableConnection connection) {
-//			if (_bsfManager == null)
-//				return;
-//			synchronized (_bsfManager) {
-//				try {
-//					_bsfManager.declareBean("connection", connection,
-//							connection.getClass());
-//					super.runScripts();
-//					_bsfManager.undeclareBean("connection");
-//				} catch (Exception e) {
-//					_logger
-//							.severe("Declaring or undeclaring a bean should not throw an exception! "
-//									+ e);
-//				}
-//			}
-		}
-
 	}
 
 }

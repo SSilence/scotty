@@ -46,15 +46,8 @@ public class SSLSocketFactoryFactory {
 	private static X500Principal CA_NAME;
 
 	static {
-//		try {
-			CA_NAME = new X500Principal("cn=OWASP Custom CA for "
-					/* + java.net.InetAddress.getLocalHost().getHostName() */
-					/* + " at " + new Date() */
-					+ ",ou=OWASP Custom CA,o=OWASP,l=OWASP,st=OWASP,c=OWASP");
-//		} catch (IOException ioe) {
-//			ioe.printStackTrace();
-//			CA_NAME = null;
-//		}
+		CA_NAME = new X500Principal("cn=OWASP Custom CA for "
+				+ ",ou=OWASP Custom CA,o=OWASP,l=OWASP,st=OWASP,c=OWASP");
 	}
 
 	private PrivateKey caKey;
@@ -91,8 +84,7 @@ public class SSLSocketFactoryFactory {
 		keystore = KeyStore.getInstance(type);
 		File file = new File(filename);
 		if (filename == null) {
-			logger
-					.info("No keystore provided, keys and certificates will be transient!");
+			logger.info("No keystore provided, keys and certificates will be transient!");
 		}
 		if (file.exists()) {
 			logger.fine("Loading keys from " + filename);
@@ -159,8 +151,9 @@ public class SSLSocketFactoryFactory {
 		}
 		return certs;
 	}
-	
-	private X509KeyManager loadKeyMaterial(String host) throws GeneralSecurityException, IOException {
+
+	private X509KeyManager loadKeyMaterial(String host)
+			throws GeneralSecurityException, IOException {
 		X509Certificate[] certs = null;
 		Certificate[] chain = keystore.getCertificateChain(host);
 		if (chain != null) {
@@ -250,9 +243,10 @@ public class SSLSocketFactoryFactory {
 		Date begin = new Date();
 		Date ends = new Date(begin.getTime() + DEFAULT_VALIDITY);
 
-		X509Certificate cert = SunCertificateUtils.sign(subject, keyPair
-				.getPublic(), caCerts[0].getSubjectX500Principal(), caCerts[0]
-				.getPublicKey(), caKey, begin, ends, getNextSerialNo());
+		X509Certificate cert = SunCertificateUtils.sign(subject,
+				keyPair.getPublic(), caCerts[0].getSubjectX500Principal(),
+				caCerts[0].getPublicKey(), caKey, begin, ends,
+				getNextSerialNo());
 
 		X509Certificate[] chain = new X509Certificate[caCerts.length + 1];
 		System.arraycopy(caCerts, 0, chain, 1, caCerts.length);
