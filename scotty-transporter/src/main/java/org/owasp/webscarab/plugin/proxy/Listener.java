@@ -64,7 +64,7 @@ public class Listener implements Runnable {
 
 	private int socketTimeout = 100;
 
-	private int maxIncomingRequests = 5;
+	private int maxIncomingRequests = 100;
 
 	private Logger _logger = Logger.getLogger(this.getClass().getName());
 
