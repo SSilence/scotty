@@ -47,7 +47,7 @@ public class Scotty {
 	/**
 	 * Key Manager for RSA Key Access
 	 */
-	private KeyManager keyManager  = KeyManager.getInstance();
+	private KeyManager keyManager = KeyManager.getInstance();
 
 	/**
 	 * WebScarab framework.
@@ -133,6 +133,11 @@ public class Scotty {
 		for (ListenerSpec spec : proxy.getProxies()) {
 			proxy.addListener(spec);
 		}
+
+		log.info("launching: "
+				+ (useGateway ? "Gateway: " + gatewayUrl : " no gateway")
+				+ ", Encryption: " + (disableEncryption ? "No" : "Yes")
+				+ ", Listening on: " + localAddr + ":" + localPort);
 	}
 
 	public ProxyPlugin createProxyPlugin(boolean useGateway,
@@ -214,12 +219,16 @@ public class Scotty {
 		HTTPClientFactory factory = HTTPClientFactory.getInstance();
 		factory.setHttpProxy(host, Integer.valueOf(port));
 		Preferences.setPreference("WebScarab.httpProxy", host + ":" + port);
+
+		log.info("Using HTTP Proxy: " + host + ":" + port);
 	}
 
 	public void setHttpsProxy(String host, Integer port) {
 		HTTPClientFactory factory = HTTPClientFactory.getInstance();
 		factory.setHttpsProxy(host, Integer.valueOf(port));
 		Preferences.setPreference("WebScarab.httpsProxy", host + ":" + port);
+
+		log.info("Using HTTPS Proxy: " + host + ":" + port);
 	}
 
 	public void stop() {
