@@ -26,8 +26,6 @@ import java.util.Random;
 
 import org.apache.commons.codec.binary.Base64;
 
-
-
 /**
  * Create, load and save keys.
  * 
@@ -78,13 +76,22 @@ public class KeyManager {
 	/**
 	 * Max validity of token
 	 */
-	private long maxValidityOfToken;
+	private long maxValidityOfToken = 3600;
 
 	/**
 	 * List of allowed client public keys.
 	 */
 	private List<PublicKey> clientPublicKeys = new ArrayList<PublicKey>();
 
+	private static final KeyManager instance = new KeyManager();
+
+	private KeyManager() {
+
+	}
+
+	public static KeyManager getInstance() {
+		return instance;
+	}
 
 	/**
 	 * Generate new key pair.
@@ -100,11 +107,10 @@ public class KeyManager {
 			privateKey = keyPair.getPrivate();
 			publicKey = keyPair.getPublic();
 		} catch (NoSuchAlgorithmException e) {
-			throw new CryptoException("Error, can't create keypair: " + e.getMessage());
+			throw new CryptoException("Error, can't create keypair: "
+					+ e.getMessage());
 		}
 	}
-
-
 
 	/**
 	 * Write private key to file (private key will be encrypted with AES first)
@@ -116,19 +122,19 @@ public class KeyManager {
 	 * @throws CryptoException
 	 *             Exception on AES encryption or IO
 	 */
-	public void writePrivateKey(String filename, String password) throws CryptoException {
+	public void writePrivateKey(String filename, String password)
+			throws CryptoException {
 		if (privateKey == null) {
 			throw new CryptoException("no private key set");
 		}
 
 		byte[] privateKeyAsByteArray = privateKey.getEncoded();
 		if (password != null && password.length() != 0)
-			privateKeyAsByteArray = AESEncryption.encrypt(privateKey.getEncoded(), password);
+			privateKeyAsByteArray = AESEncryption.encrypt(
+					privateKey.getEncoded(), password);
 
 		writeKey(filename, privateKeyAsByteArray);
 	}
-
-
 
 	/**
 	 * Write public key to file.
@@ -145,8 +151,6 @@ public class KeyManager {
 		writeKey(filename, publicKey.getEncoded());
 	}
 
-
-
 	/**
 	 * Writes back given byte array into a given file.
 	 * 
@@ -160,31 +164,32 @@ public class KeyManager {
 			out.write(new Base64().encode(key));
 			out.close();
 		} catch (IOException e) {
-			throw new CryptoException("Error writing public key into file: " + e.getMessage());
+			throw new CryptoException("Error writing public key into file: "
+					+ e.getMessage());
 		}
 	}
 
-
-
 	/**
-	 * Reads a private key from file, decrypts it with password (AES) and saves the key in KeyManager.
+	 * Reads a private key from file, decrypts it with password (AES) and saves
+	 * the key in KeyManager.
 	 * 
 	 * @param filename
 	 * @param password
 	 * @throws CryptoException
 	 */
-	public void readPrivateKey(String filename, String password) throws CryptoException {
+	public void readPrivateKey(String filename, String password)
+			throws CryptoException {
 		try {
 			byte[] privateKeyFromFile = readFileBase64Decoded(filename);
 			if (password != null && password.length() != 0)
-				privateKeyFromFile = AESEncryption.decrypt(privateKeyFromFile, password);
+				privateKeyFromFile = AESEncryption.decrypt(privateKeyFromFile,
+						password);
 			this.privateKey = parsePrivateKeyFromByteArray(privateKeyFromFile);
 		} catch (Exception e) {
-			throw new CryptoException("Error, can't read private key: " + e.getMessage());
+			throw new CryptoException("Error, can't read private key: "
+					+ e.getMessage());
 		}
 	}
-
-
 
 	/**
 	 * Read public key and saves it in KeyManager.
@@ -197,11 +202,10 @@ public class KeyManager {
 			byte[] publicKey = readFileBase64Decoded(filename);
 			this.publicKey = parsePublicKeyFromByteArray(publicKey);
 		} catch (Exception e) {
-			throw new CryptoException("Error, can't read public key: " + e.getMessage());
+			throw new CryptoException("Error, can't read public key: "
+					+ e.getMessage());
 		}
 	}
-
-
 
 	/**
 	 * Read gateways public key and saves it in KeyManager.
@@ -214,14 +218,14 @@ public class KeyManager {
 			byte[] publicKey = readFileBase64Decoded(filename);
 			this.gatewaysPublicKey = parsePublicKeyFromByteArray(publicKey);
 		} catch (Exception e) {
-			throw new CryptoException("Error, can't read gateways public key: " + e.getMessage());
+			throw new CryptoException("Error, can't read gateways public key: "
+					+ e.getMessage());
 		}
 	}
 
-
-
 	/**
-	 * Reads the public keys of the clients. One key per line. (Content is Base64 coded).
+	 * Reads the public keys of the clients. One key per line. (Content is
+	 * Base64 coded).
 	 * 
 	 * @param filename
 	 * @throws CryptoException
@@ -230,20 +234,21 @@ public class KeyManager {
 		try {
 			byte[] content = readFile(filename);
 
-			BufferedReader r = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(content)));
+			BufferedReader r = new BufferedReader(new InputStreamReader(
+					new ByteArrayInputStream(content)));
 
 			String clientPublicKey;
 			while ((clientPublicKey = r.readLine()) != null) {
-				PublicKey key = parsePublicKeyFromByteArray(Base64.decodeBase64(clientPublicKey));
+				PublicKey key = parsePublicKeyFromByteArray(Base64
+						.decodeBase64(clientPublicKey));
 				clientPublicKeys.add(key);
 			}
 
 		} catch (Exception e) {
-			throw new CryptoException("Error, can't read gateways public key: " + e.getMessage());
+			throw new CryptoException("Error, can't read gateways public key: "
+					+ e.getMessage());
 		}
 	}
-
-
 
 	/**
 	 * Reads a given file and return it as byte array.
@@ -259,7 +264,8 @@ public class KeyManager {
 
 			if (filename.startsWith("resources")) {
 				ClassLoader classLoader = getClass().getClassLoader();
-				fileInputStream = classLoader.getResourceAsStream(filename.substring(filename.indexOf(":") + 1));
+				fileInputStream = classLoader.getResourceAsStream(filename
+						.substring(filename.indexOf(":") + 1));
 			} else {
 				fileInputStream = new FileInputStream(new File(filename));
 			}
@@ -269,26 +275,25 @@ public class KeyManager {
 
 			return b;
 		} catch (IOException e) {
-			throw new CryptoException("Error writing public key into file: " + e.getMessage());
+			throw new CryptoException("Error writing public key into file: "
+					+ e.getMessage());
 		}
 	}
 
-
-
 	/**
-	 * Reads a given file and return it as byte array, decodes the Base64 content.
+	 * Reads a given file and return it as byte array, decodes the Base64
+	 * content.
 	 * 
 	 * @param filename
 	 * @return byte array
 	 * @throws CryptoException
 	 */
-	private byte[] readFileBase64Decoded(String filename) throws CryptoException {
+	private byte[] readFileBase64Decoded(String filename)
+			throws CryptoException {
 		byte[] file = readFile(filename);
 
 		return Base64.decodeBase64(file);
 	}
-
-
 
 	/**
 	 * Converts a public key from byte array to PublicKey object
@@ -298,16 +303,15 @@ public class KeyManager {
 	 * @throws InvalidKeySpecException
 	 * @throws NoSuchAlgorithmException
 	 */
-	private synchronized PublicKey parsePublicKeyFromByteArray(byte[] publicKeyRaw) throws InvalidKeySpecException,
-		NoSuchAlgorithmException {
+	private synchronized PublicKey parsePublicKeyFromByteArray(
+			byte[] publicKeyRaw) throws InvalidKeySpecException,
+			NoSuchAlgorithmException {
 		PublicKey publicKey = null;
 		KeyFactory keyFactory = KeyFactory.getInstance("RSA");
 		EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyRaw);
 		publicKey = keyFactory.generatePublic(publicKeySpec);
 		return publicKey;
 	}
-
-
 
 	/**
 	 * Converts a private key from byte array to PrivateKey object
@@ -317,16 +321,15 @@ public class KeyManager {
 	 * @throws InvalidKeySpecException
 	 * @throws NoSuchAlgorithmException
 	 */
-	private synchronized PrivateKey parsePrivateKeyFromByteArray(byte[] privateKeyRaw) throws InvalidKeySpecException,
-		NoSuchAlgorithmException {
+	private synchronized PrivateKey parsePrivateKeyFromByteArray(
+			byte[] privateKeyRaw) throws InvalidKeySpecException,
+			NoSuchAlgorithmException {
 		PrivateKey privateKey = null;
 		KeyFactory keyFactory = KeyFactory.getInstance("RSA");
 		EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyRaw);
 		privateKey = keyFactory.generatePrivate(privateKeySpec);
 		return privateKey;
 	}
-
-
 
 	/**
 	 * Reads from InputStream and return content as byte array
@@ -351,10 +354,9 @@ public class KeyManager {
 		return buffer.toByteArray();
 	}
 
-
-
 	/**
-	 * Returns current token. If token is no longer valid, a new one will be generated.
+	 * Returns current token. If token is no longer valid, a new one will be
+	 * generated.
 	 * 
 	 * @return current token
 	 * @throws CryptoException
@@ -363,7 +365,8 @@ public class KeyManager {
 		try {
 			// valid token available?
 			long timestamp = (new Date().getTime()) / 1000;
-			if (currentTokenTimestamp != NO_TOKEN_SET && timestamp < currentTokenTimestamp + maxValidityOfToken) {
+			if (currentTokenTimestamp != NO_TOKEN_SET
+					&& timestamp < currentTokenTimestamp + maxValidityOfToken) {
 				return currentToken;
 			}
 
@@ -377,19 +380,24 @@ public class KeyManager {
 			aesPasswordAndTimestamp.append(timestamp);
 
 			// encrypt token with gateways public key
-			byte[] encryptedToken = RSAEncryption.encrypt(aesPasswordAndTimestamp.toString().getBytes(),
+			byte[] encryptedToken = RSAEncryption.encrypt(
+					aesPasswordAndTimestamp.toString().getBytes(),
 					getGatewaysPublicKey());
 
 			// sign AES key and password
-			byte[] sign = RSAEncryption.sign(aesPasswordAndTimestamp.toString().getBytes(), privateKey);
+			byte[] sign = RSAEncryption.sign(aesPasswordAndTimestamp.toString()
+					.getBytes(), privateKey);
 
 			Base64 base64 = new Base64();
 			StringBuilder encryptedAesTimestampAndSign = new StringBuilder();
-			encryptedAesTimestampAndSign.append(new String(base64.encode(encryptedToken)));
+			encryptedAesTimestampAndSign.append(new String(base64
+					.encode(encryptedToken)));
 			encryptedAesTimestampAndSign.append(new String("|")); // separator
-			encryptedAesTimestampAndSign.append(new String(base64.encode(sign)));
+			encryptedAesTimestampAndSign
+					.append(new String(base64.encode(sign)));
 
-			this.currentToken = encryptedAesTimestampAndSign.toString().getBytes();
+			this.currentToken = encryptedAesTimestampAndSign.toString()
+					.getBytes();
 			this.currentAESPassword = randomAesPassword;
 			this.currentTokenTimestamp = timestamp;
 
@@ -399,8 +407,6 @@ public class KeyManager {
 		}
 
 	}
-
-
 
 	/**
 	 * Generates an random string
@@ -421,91 +427,61 @@ public class KeyManager {
 		return buffer.toString();
 	}
 
-
-
 	public PrivateKey getPrivateKey() {
 		return privateKey;
 	}
-
-
 
 	public void setPrivateKey(PrivateKey privateKey) {
 		this.privateKey = privateKey;
 	}
 
-
-
 	public PublicKey getPublicKey() {
 		return publicKey;
 	}
-
-
 
 	public void setPublicKey(PublicKey publicKey) {
 		this.publicKey = publicKey;
 	}
 
-
-
 	public PublicKey getGatewaysPublicKey() {
 		return gatewaysPublicKey;
 	}
-
-
 
 	public void setGatewaysPublicKey(PublicKey gatewaysPublicKey) {
 		this.gatewaysPublicKey = gatewaysPublicKey;
 	}
 
-
-
 	public String getCurrentAESPassword() {
 		return currentAESPassword;
 	}
-
-
 
 	public void setCurrentAESPassword(String currentAESPassword) {
 		this.currentAESPassword = currentAESPassword;
 	}
 
-
-
 	public long getCurrentTokenTimestamp() {
 		return currentTokenTimestamp;
 	}
-
-
 
 	public void setCurrentTokenTimestamp(long currentTokenTimestamp) {
 		this.currentTokenTimestamp = currentTokenTimestamp;
 	}
 
-
-
 	public long getMaxValidityOfToken() {
 		return maxValidityOfToken;
 	}
-
-
 
 	public void setMaxValidityOfToken(long maxValidityOfToken) {
 		this.maxValidityOfToken = maxValidityOfToken;
 	}
 
-
-
 	public void setCurrentToken(byte[] currentToken) {
 		this.currentToken = currentToken;
 	}
 
-
-
 	public List<PublicKey> getClientPublicKeys() {
 		return clientPublicKeys;
 	}
-
-
 
 	public void setClientPublicKeys(List<PublicKey> clientPublicKeys) {
 		this.clientPublicKeys = clientPublicKeys;

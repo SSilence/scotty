@@ -1,15 +1,14 @@
 package scotty.crypto;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.Arrays;
 
-import org.easymock.classextension.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * Test RSA Encryption
@@ -35,7 +34,7 @@ public class RSAEncryptionTest {
 	 */
 	@Test
 	public void testEncryptDecrypt() throws CryptoException {
-		KeyManager keyManager = new KeyManager();
+		KeyManager keyManager = KeyManager.getInstance();
 		keyManager.generateKeyPair();
 
 		byte[] content = new byte[] { 'a', 'b', 'c' };
@@ -55,7 +54,7 @@ public class RSAEncryptionTest {
 	 */
 	@Test
 	public void testSign() throws CryptoException {
-		KeyManager keyManager = new KeyManager();
+		KeyManager keyManager = KeyManager.getInstance();
 		keyManager.generateKeyPair();
 
 		byte[] content = new byte[] { 'a', 'b', 'c' };

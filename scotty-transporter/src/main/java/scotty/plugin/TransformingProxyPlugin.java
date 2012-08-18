@@ -9,7 +9,6 @@ import org.owasp.webscarab.model.Request;
 import org.owasp.webscarab.model.Response;
 import org.owasp.webscarab.plugin.proxy.ProxyPlugin;
 
-import scotty.Scotty;
 import scotty.transformer.RequestTransformer;
 import scotty.transformer.ResponseTransformer;
 import scotty.util.UserAgentProvider;
@@ -31,10 +30,13 @@ public class TransformingProxyPlugin extends ProxyPlugin {
 
 	private UserAgentProvider uaProvider = new UserAgentProvider();
 
+	private String gatewayUrl;
+
 	public TransformingProxyPlugin(RequestTransformer requestTransformer,
-			ResponseTransformer responseTransformer) {
+			ResponseTransformer responseTransformer, String gatewayUrl) {
 		this.requestTransformer = requestTransformer;
 		this.responseTransformer = responseTransformer;
+		this.gatewayUrl = gatewayUrl;
 	}
 
 	@Override
@@ -66,7 +68,7 @@ public class TransformingProxyPlugin extends ProxyPlugin {
 			request = new Request();
 			request.setContent(cryptedRequest);
 
-			HttpUrl gateway = new HttpUrl(Scotty.gatewayUrl);
+			HttpUrl gateway = new HttpUrl(gatewayUrl);
 			request.setHeader("Host", gateway.getHost());
 			request.setHeader("Accept-Charset",
 					"ISO-8859-1,utf-8;q=0.7,*;q=0.3");
@@ -80,7 +82,7 @@ public class TransformingProxyPlugin extends ProxyPlugin {
 			request.setMethod("POST");
 
 			if ("https".equalsIgnoreCase(url.getScheme())) {
-				request.setURL(new HttpUrl(Scotty.gatewayUrl + "?ssl=true"));
+				request.setURL(new HttpUrl(gatewayUrl + "?ssl=true"));
 			} else {
 				request.setURL(gateway);
 			}

@@ -27,7 +27,7 @@ import scotty.fetcher.GoogleFetcher;
 
 public class GatewayServlet extends HttpServlet {
 
-	private KeyManager km = new KeyManager();
+	private KeyManager km = KeyManager.getInstance();
 
 	private Map<String, Token> keyCache = new ConcurrentHashMap<String, GatewayServlet.Token>();
 

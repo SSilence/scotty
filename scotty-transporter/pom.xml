@@ -6,6 +6,11 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>scotty transporter</name>
 	<dependencies>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+		</dependency>
 
 		<dependency>
 			<groupId>proxyvole</groupId>
@@ -82,7 +87,7 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>scotty.Scotty</mainClass>
+							<mainClass>scotty.ScottyCli</mainClass>
 							<packageName>scotty</packageName>
 						</manifest>
 					</archive>
@@ -97,7 +102,7 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>scotty.Scotty</mainClass>
+							<mainClass>scotty.ScottyCli</mainClass>
 							<packageName>scotty</packageName>
 						</manifest>
 					</archive>
