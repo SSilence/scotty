@@ -9,6 +9,6 @@
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <property name="java-output-path" value="/scotty-gae-gateway/target/classes"/>
-        <property name="context-root" value="scotty-gae-gateway"/>
+        <property name="context-root" value="scotty-gateway"/>
     </wb-module>
 </project-modules>
