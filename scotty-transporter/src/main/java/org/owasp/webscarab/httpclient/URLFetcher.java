@@ -342,7 +342,7 @@ public class URLFetcher implements HTTPClient {
 			if (request.getMethod().equals("HEAD"))
 				_response.setNoBody();
 
-			_logger.info(request.getURL() + " : " + _response.getStatusLine());
+			//_logger.info(request.getURL() + " : " + _response.getStatusLine());
 
 			String connection = _response.getHeader("Proxy-Connection");
 			if (connection != null && "close".equalsIgnoreCase(connection)) {
@@ -361,7 +361,7 @@ public class URLFetcher implements HTTPClient {
 								.equalsIgnoreCase("Close"))) {
 					_lastRequestTime = System.currentTimeMillis();
 				} else {
-					_logger.info("Closing connection!");
+					//_logger.info("Closing connection!");
 					_in = null;
 					_out = null;
 					// do NOT close the socket itself, since the message body
