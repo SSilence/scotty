@@ -1,6 +1,7 @@
 scotty
 http://www.aditu.de
 tobias.zeising@aditu.de
+florian.fuchs@devhood.org
 Version 0.1
 License: GPLv3
 
