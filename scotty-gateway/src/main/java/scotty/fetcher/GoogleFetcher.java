@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.List;
 
@@ -88,6 +89,9 @@ public class GoogleFetcher implements Fetcher {
 			URL reqUrl = new URL(url);
 			HTTPRequest req = new HTTPRequest(reqUrl, HTTPMethod.valueOf(method
 					.toUpperCase()));
+			 byte[] body = HttpParser.readRawLine(is);
+			 req.setPayload(body);
+			 
 			for (Header header : h) {
 				HTTPHeader head = new HTTPHeader(header.getName(),
 						header.getValue());
