@@ -1,13 +1,5 @@
 package scotty;
 
-import java.net.InetSocketAddress;
-import java.net.Proxy.Type;
-import java.net.ProxySelector;
-import java.net.URI;
-import java.util.List;
-
-import javax.swing.JOptionPane;
-
 import org.apache.log4j.Logger;
 import org.owasp.webscarab.httpclient.HTTPClientFactory;
 import org.owasp.webscarab.model.Preferences;
@@ -31,8 +23,6 @@ import scotty.transformer.impl.DefaultResponseTransformer;
 import scotty.ui.SystrayIndicatorProxyPlugin;
 import scotty.ui.SystrayManager;
 import scotty.util.Messages;
-
-import com.btr.proxy.search.ProxySearch;
 
 /**
  * scotty TODO doc
@@ -89,16 +79,9 @@ public class Scotty {
 	 */
 	private String localAddr = "127.0.0.1";
 
-	/**
-	 * Set if, proxy-vole should try to autoconfig the proxy. (If cmdline args
-	 * are not used).
-	 */
-	private boolean autoConfigProxy = true;
-
 	public void init() throws Exception {
 		systray.setTooltip(msgs.scotty() + " " + gatewayUrl);
 
-		configureProxySettings();
 		framework = new Framework();
 
 		Preferences.setPreference("WebScarab.promptForCredentials", "true");
@@ -171,48 +154,6 @@ public class Scotty {
 			return new ClearTextResponseTransformer();
 		}
 		return new DefaultResponseTransformer(keyManager);
-	}
-
-	/**
-	 * Configures the Proxy Settings to access the gatway, uses system settings
-	 * by utilising proxy-vole.
-	 */
-	public void configureProxySettings() {
-		if (!autoConfigProxy)
-			return;
-
-		try {
-			ProxySearch proxySearch = ProxySearch.getDefaultProxySearch();
-			ProxySelector myProxySelector = proxySearch.getProxySelector();
-
-			ProxySelector.setDefault(myProxySelector);
-
-			List<java.net.Proxy> proxies = ProxySelector.getDefault().select(
-					new URI(gatewayUrl));
-			if (proxies.size() > 0) {
-				HTTPClientFactory factory = HTTPClientFactory.getInstance();
-				for (java.net.Proxy p : proxies) {
-					InetSocketAddress address = (InetSocketAddress) p.address();
-
-					if (Type.HTTP == p.type()) {
-						setHttpProxy(address.getHostName(), address.getPort());
-					} else if (Type.SOCKS == p.type()) {
-						setHttpsProxy(address.getHostName(), address.getPort());
-					}
-				}
-			}
-		} catch (Exception e) {
-			log.warn(
-					"Exception while trying to set proxy automatically via proxy-vole",
-					e);
-			JOptionPane
-					.showMessageDialog(
-							null,
-							"Proxy could not be set! Try it manually via -proxyHost -proxyPort",
-							"Proxy not resolved", JOptionPane.WARNING_MESSAGE);
-
-		}
-
 	}
 
 	public void setHttpProxy(String host, Integer port) {
@@ -288,13 +229,5 @@ public class Scotty {
 
 		Preferences.setPreference("Proxy.listeners", localAddr + ":"
 				+ localPort);
-	}
-
-	public boolean isAutoConfigProxy() {
-		return autoConfigProxy;
-	}
-
-	public void setAutoConfigProxy(boolean autoConfigProxy) {
-		this.autoConfigProxy = autoConfigProxy;
 	}
 }

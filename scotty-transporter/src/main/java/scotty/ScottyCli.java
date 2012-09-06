@@ -262,7 +262,6 @@ public class ScottyCli implements EventObserver {
 			scotty.setHttpsProxy(line.getOptionValue(PROXY_HOST_CMDLINE_PARAM),
 					Integer.valueOf(line
 							.getOptionValue(PROXY_PORT_CMDLINE_PARAM)));
-			scotty.setAutoConfigProxy(false);
 		}
 
 		scotty.setGatewayUrl(line.getOptionValue(GATEWAY_CMDLINE_PARAM, null));
