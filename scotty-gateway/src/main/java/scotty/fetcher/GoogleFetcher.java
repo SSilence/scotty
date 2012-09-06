@@ -18,12 +18,12 @@ import com.google.appengine.api.urlfetch.HTTPResponse;
 import com.google.appengine.api.urlfetch.URLFetchService;
 import com.google.appengine.api.urlfetch.URLFetchServiceFactory;
 
-
 /**
- * This fetcher implementation useses the Google Appengine {@link URLFetchService} to fetch the contents.
+ * This fetcher implementation useses the Google Appengine
+ * {@link URLFetchService} to fetch the contents.
  * 
  * @author flo
- *
+ * 
  */
 public class GoogleFetcher implements Fetcher {
 	private static final String[][] HttpReplies = { { "100", "Continue" },
@@ -89,9 +89,15 @@ public class GoogleFetcher implements Fetcher {
 			URL reqUrl = new URL(url);
 			HTTPRequest req = new HTTPRequest(reqUrl, HTTPMethod.valueOf(method
 					.toUpperCase()));
-			 byte[] body = HttpParser.readRawLine(is);
-			 req.setPayload(body);
-			 
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			byte[] oneLine = null;
+
+			while ((oneLine = HttpParser.readRawLine(is)) != null) {
+				bos.write(oneLine);
+			}
+			byte[] body = bos.toByteArray();
+			req.setPayload(body);
+
 			for (Header header : h) {
 				HTTPHeader head = new HTTPHeader(header.getName(),
 						header.getValue());
