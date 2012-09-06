@@ -329,7 +329,7 @@ public class ConnectionHandler implements Runnable {
 		response.setHeader("Connection", "Close");
 		String template = "<HTML><HEAD><TITLE>WebScarab Error</TITLE></HEAD>";
 		template = template
-				+ "<BODY>WebScarab encountered an error trying to retrieve <P><pre>"
+				+ "<BODY>scotty encountered an error trying to retrieve <P><pre>"
 				+ HtmlEncoder.encode(request.toString()) + "</pre><P>";
 		template = template + "The error was : <P><pre>"
 				+ HtmlEncoder.encode(e.getLocalizedMessage()) + "\n";
