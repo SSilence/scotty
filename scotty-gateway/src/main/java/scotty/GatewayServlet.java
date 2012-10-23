@@ -66,11 +66,11 @@ public class GatewayServlet extends HttpServlet {
 			if ( req.getParameter("enc") == null ) {
 				byte[] cryptedResponse = AESEncryption.encrypt(response, aesPassword);
 				resp.getOutputStream().write(Base64.encodeBase64(cryptedResponse));
-				
-			}else {				
+
+			}else {
 				resp.getOutputStream().write(Base64.encodeBase64(response));
 			}
-			
+
 
 		} catch (CryptoException e) {
 			// TODO Auto-generated catch block
@@ -175,7 +175,7 @@ public class GatewayServlet extends HttpServlet {
 
 	/**
 	 * TODO Alert if signature is not valid.
-	 * 
+	 *
 	 * @param decryptedToken
 	 * @param m
 	 * @throws CryptoException
@@ -200,5 +200,15 @@ public class GatewayServlet extends HttpServlet {
 	class Token {
 		String aesPassword;
 		long timestamp;
+	}
+
+	public Fetcher getFetcher() {
+		return fetcher;
+	}
+
+
+
+	public void setFetcher(Fetcher fetcher) {
+		this.fetcher = fetcher;
 	}
 }

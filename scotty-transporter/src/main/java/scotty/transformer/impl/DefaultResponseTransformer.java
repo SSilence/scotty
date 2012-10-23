@@ -31,7 +31,7 @@ public class DefaultResponseTransformer implements ResponseTransformer {
 		}
 
 		Response r = new Response();
-
+		r.setRawContent(true);
 		try {
 			r.read(new ByteArrayInputStream(response));
 		} catch (Exception e) {

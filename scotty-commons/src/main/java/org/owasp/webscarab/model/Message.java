@@ -41,11 +41,10 @@ package org.owasp.webscarab.model;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.UnsupportedEncodingException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,20 +64,25 @@ import org.owasp.webscarab.httpclient.FixedLengthInputStream;
  * @author rdawes
  */
 public class Message {
-    
+
     private ArrayList<NamedValue> _headers = null;
     private NamedValue[] NO_HEADERS = new NamedValue[0];
-    
+
     private static final byte[] NO_CONTENT = new byte[0];
-    
+
     InputStream _contentStream = null;
     ByteArrayOutputStream _content = null;
     boolean _chunked = false;
     boolean _gzipped = false;
     int _length = -1;
-    
+
+    /**
+     * Body of HTTP Message is not unchunked/gunzipped. the body gets not touched.
+     */
+    private boolean rawContent;
+
     protected Logger _logger = Logger.getLogger(this.getClass().getName());
-    
+
     /** Message is a class that is used to represent the bulk of an HTTP message, namely
      * the headers, and (possibly null) body. Messages should not be instantiated
      * directly, but should rather be created by a derived class, namely Request or
@@ -86,7 +90,7 @@ public class Message {
      */
     public Message() {
     }
-    
+
     /**
      * Instructs the class to read the headers from the InputStream, and assign the
      * InputStream as the contentStream, from which the body of the message can be
@@ -119,15 +123,19 @@ public class Message {
                 previous = line;
             }
         } while (!line.equals(""));
-        
+
         _contentStream = is;
-        if (_chunked) {
-            _contentStream = new ChunkedInputStream(_contentStream);
-        } else if (_length > -1) {
-            _contentStream = new FixedLengthInputStream(_contentStream, _length);
+
+
+        if (  !rawContent) {
+	        if (_chunked) {
+	            _contentStream = new ChunkedInputStream(_contentStream);
+	        } else if (_length > -1) {
+	            _contentStream = new FixedLengthInputStream(_contentStream, _length);
+	        }
         }
     }
-    
+
     /**
      * Writes the Message headers and content to the supplied OutputStream
      * @param os The OutputStream to write the Message headers and content to
@@ -136,7 +144,7 @@ public class Message {
     public void write(OutputStream os) throws IOException {
         write(os, "\r\n");
     }
-    
+
     /**
      * Writes the Message headers and content to the supplied OutputStream
      * @param os The OutputStream to write the Message headers and content to
@@ -170,7 +178,7 @@ public class Message {
             ((ChunkedOutputStream) os).writeTrailer();
         }
     }
-    
+
     /**
      * Instructs the class to read the headers and content from the supplied StringBuffer
      * N.B. The "Content-length" header is updated automatically to reflect the true size
@@ -202,7 +210,7 @@ public class Message {
                 previous = line;
             }
         } while (!line.equals(""));
-        
+
         _content = new ByteArrayOutputStream();
         try {
             _content.write(buffer.toString().getBytes());
@@ -212,14 +220,15 @@ public class Message {
             setHeader(new NamedValue("Content-length", Integer.toString(_content.size())));
         }
     }
-    
+
     /** Returns a String representation of the message, *including* the message body.
      * @return The string representation of the message
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return toString("\r\n");
     }
-    
+
     /** Returns a String representation of the message, *including* the message body.
      * Lines of the header are separated by the supplied "CarriageReturnLineFeed" string.
      * @return a String representation of the Message.
@@ -251,7 +260,7 @@ public class Message {
         }
         return buff.toString();
     }
-    
+
     private void updateFlagsForHeader(NamedValue header) {
         if (header.getName().equalsIgnoreCase("Transfer-Encoding")) {
             if (header.getValue().indexOf("chunked")>-1) {
@@ -273,7 +282,7 @@ public class Message {
             }
         }
     }
-    
+
     /**
      * sets the value of a header. This overwrites any previous values of headers with the same name.
      * @param name the name of the header (without a colon)
@@ -282,7 +291,7 @@ public class Message {
     public void setHeader(String name, String value) {
         setHeader(new NamedValue(name, value.trim()));
     }
-    
+
     public void setHeader(NamedValue header) {
         updateFlagsForHeader(header);
         if (_headers == null) {
@@ -298,7 +307,7 @@ public class Message {
         }
         _headers.add(header);
     }
-    
+
     /**
      * Adds a header with the specified name and value. This preserves any previous
      * headers with the same name, and adds another header with the same name.
@@ -308,7 +317,7 @@ public class Message {
     public void addHeader(String name, String value) {
         addHeader(new NamedValue(name, value.trim()));
     }
-    
+
     public void addHeader(NamedValue header) {
         updateFlagsForHeader(header);
         if (_headers == null) {
@@ -316,7 +325,7 @@ public class Message {
         }
         _headers.add(header);
     }
-    
+
     /**
      * Removes a header
      * @param name the name of the header (without a colon)
@@ -336,7 +345,7 @@ public class Message {
         }
         return null;
     }
-    
+
     /**
      * Returns an array of header names
      * @return an array of the header names
@@ -352,7 +361,7 @@ public class Message {
         }
         return names;
     }
-    
+
     /**
      * Returns the value of the requested header
      * @param name the name of the header (without a colon)
@@ -370,14 +379,14 @@ public class Message {
         }
         return null;
     }
-    
+
     /**
      * Returns all the values of the requested header, if there are multiple items
      * @param name the name of the header (without a colon)
      * @return the values of the header in question (null if the header did not exist)
      */
     public String[] getHeaders(String name) {
-        if (_headers == null) 
+        if (_headers == null)
             return null;
         ArrayList<String> values = new ArrayList<String>();
         for (int i=0; i<_headers.size(); i++) {
@@ -386,14 +395,14 @@ public class Message {
                 values.add(nv.getValue());
             }
         }
-        if (values.size() == 0) 
+        if (values.size() == 0)
             return null;
         return values.toArray(new String[0]);
     }
-    
+
     /**
      * returns the header names and their values
-     * @return an array of NamedValue's representing the names and values 
+     * @return an array of NamedValue's representing the names and values
      * of the headers
      */
     public NamedValue[] getHeaders() {
@@ -402,7 +411,7 @@ public class Message {
         }
         return _headers.toArray(NO_HEADERS);
     }
-    
+
     /**
      * sets the headers
      * @param table a two dimensional array of Strings, where table[i][0] is the header name and
@@ -418,7 +427,7 @@ public class Message {
             addHeader(headers[i]);
         }
     }
-    
+
     /**
      * a protected method to read a line up to and including the CR or CRLF.
      *
@@ -451,7 +460,7 @@ public class Message {
         _logger.finest(line.toString());
         return line.toString();
     }
-    
+
     /**
      * a protected method to read a line up to and including the CR or CRLF.
      * Removes the line from the supplied StringBuffer.
@@ -478,7 +487,7 @@ public class Message {
             return "";
         }
     }
-    
+
     /** getContent returns the message body that accompanied the request.
      * if the message was read from an InputStream, it reads the content from
      * the InputStream and returns a copy of it.
@@ -493,7 +502,7 @@ public class Message {
         } catch (IOException ioe) {
             _logger.info("IOException flushing the contentStream: " + ioe);
         }
-        if (_content != null && _gzipped) {
+        if (_content != null && _gzipped && !rawContent) {
             try {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 GZIPInputStream gzis = new GZIPInputStream(new ByteArrayInputStream(_content.toByteArray()));
@@ -514,7 +523,7 @@ public class Message {
             return NO_CONTENT;
         }
     }
-    
+
     /**
      * reads all content from the content stream if one exists. Bytes read are stored internally, and returned via getContent()
      */
@@ -525,7 +534,7 @@ public class Message {
             _logger.info("Exception flushing the contentStream " + ioe);
         }
     }
-    
+
     /** reads all the bytes in the contentStream into a local ByteArrayOutputStream
      * where they can be retrieved by the getContent() methods.
      * Optionally writes the bytes read to the supplied outputstream
@@ -560,7 +569,7 @@ public class Message {
         _contentStream = null;
         if (ioe != null) throw ioe;
     }
-    
+
     /**
      * sets the message to not have a body. This is typical for a CONNECT request or
      * response, which should not read any body.
@@ -569,7 +578,7 @@ public class Message {
         _content = null;
         _contentStream = null;
     }
-    
+
     /**
      * Sets the content of the message body. If the message headers indicate that the
      * content is gzipped, the content is automatically compressed
@@ -603,8 +612,9 @@ public class Message {
             setHeader(new NamedValue("Content-length", Integer.toString(_content.size())));
         }
     }
-    
-    public boolean equals(Object obj) {
+
+    @Override
+	public boolean equals(Object obj) {
         if (! (obj instanceof Message)) return false;
         Message mess = (Message) obj;
         NamedValue[] myHeaders = getHeaders();
@@ -618,5 +628,13 @@ public class Message {
         byte[] thatContent = mess.getContent();
         return Arrays.equals(myContent, thatContent);
     }
-    
+
+	public boolean isRawContent() {
+		return rawContent;
+	}
+
+	public void setRawContent(boolean rawContent) {
+		this.rawContent = rawContent;
+	}
+
 }

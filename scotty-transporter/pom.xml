@@ -18,11 +18,6 @@
 			<version>1.6</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-jdk16</artifactId>
-			<version>1.44</version>
-		</dependency>
 
 		<dependency>
 			<groupId>concurrent</groupId>
