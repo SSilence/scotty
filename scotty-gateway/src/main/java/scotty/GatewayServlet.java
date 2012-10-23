@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -23,8 +25,6 @@ import scotty.crypto.RSAEncryption;
 import scotty.fetcher.Fetcher;
 import scotty.fetcher.GoogleFetcher;
 
-
-
 public class GatewayServlet extends HttpServlet {
 
 	private KeyManager km = KeyManager.getInstance();
@@ -33,7 +33,8 @@ public class GatewayServlet extends HttpServlet {
 
 	private Fetcher fetcher = new GoogleFetcher();
 
-
+	private static Logger log = Logger
+			.getLogger(GatewayServlet.class.getName());
 
 	public GatewayServlet() {
 		try {
@@ -47,10 +48,9 @@ public class GatewayServlet extends HttpServlet {
 		}
 	}
 
-
-
 	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
 		clearCache();
 		Message m = getContent(req);
 
@@ -58,21 +58,24 @@ public class GatewayServlet extends HttpServlet {
 			String aesPassword = getAesPassword(m);
 
 			byte[] encMessage = Base64.decodeBase64(m.getEncryptedMessage());
-			byte[] decodedMessage = AESEncryption.decrypt(encMessage, aesPassword);
+			byte[] decodedMessage = AESEncryption.decrypt(encMessage,
+					aesPassword);
 
 			// parse request, execute request..
 			byte[] response = fetcher.fetch(decodedMessage);
 
-			if ( req.getParameter("enc") == null ) {
-				byte[] cryptedResponse = AESEncryption.encrypt(response, aesPassword);
-				resp.getOutputStream().write(Base64.encodeBase64(cryptedResponse));
+			if (req.getParameter("enc") == null) {
+				byte[] cryptedResponse = AESEncryption.encrypt(response,
+						aesPassword);
+				resp.getOutputStream().write(
+						Base64.encodeBase64(cryptedResponse));
 
-			}else {
+			} else {
 				resp.getOutputStream().write(Base64.encodeBase64(response));
 			}
 
-
 		} catch (CryptoException e) {
+			log.log(Level.SEVERE, "Error, response could not be decoded", e);
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
@@ -80,8 +83,6 @@ public class GatewayServlet extends HttpServlet {
 		}
 
 	}
-
-
 
 	private void clearCache() {
 		for (Map.Entry<String, Token> entry : keyCache.entrySet()) {
@@ -96,11 +97,10 @@ public class GatewayServlet extends HttpServlet {
 
 	}
 
-
-
 	public Message getContent(HttpServletRequest req) throws IOException {
 
-		BufferedReader r = new BufferedReader(new InputStreamReader(req.getInputStream()));
+		BufferedReader r = new BufferedReader(new InputStreamReader(
+				req.getInputStream()));
 		StringBuilder b = new StringBuilder();
 		String line;
 		while ((line = r.readLine()) != null) {
@@ -118,8 +118,6 @@ public class GatewayServlet extends HttpServlet {
 		return m;
 	}
 
-
-
 	public String getAesPassword(Message m) throws CryptoException {
 		// Cache pruefen.
 		Token cachedToken = keyCache.get(m.getCryptedToken());
@@ -129,7 +127,8 @@ public class GatewayServlet extends HttpServlet {
 
 		byte[] cryptedToken = Base64.decodeBase64(m.getCryptedToken());
 		// token mit privkey entschluesseln.
-		byte[] decryptedToken = RSAEncryption.decrypt(cryptedToken, km.getPrivateKey());
+		byte[] decryptedToken = RSAEncryption.decrypt(cryptedToken,
+				km.getPrivateKey());
 		String tokenAndTimestamp = new String(decryptedToken);
 
 		String[] tokenAndTimestampArr = tokenAndTimestamp.split("\\|");
@@ -156,22 +155,16 @@ public class GatewayServlet extends HttpServlet {
 		return aesPassword;
 	}
 
-
-
 	public long getNowTimestamp() {
 		Date now = new Date();
 		return now.getTime();
 	}
-
-
 
 	public void addToCache(Message m, Token t) {
 		String cryptedToken = m.getCryptedToken();
 
 		keyCache.put(cryptedToken, t);
 	}
-
-
 
 	/**
 	 * TODO Alert if signature is not valid.
@@ -180,12 +173,14 @@ public class GatewayServlet extends HttpServlet {
 	 * @param m
 	 * @throws CryptoException
 	 */
-	public void checkSignature(byte[] decryptedToken, Message m) throws CryptoException {
+	public void checkSignature(byte[] decryptedToken, Message m)
+			throws CryptoException {
 		List<PublicKey> keys = km.getClientPublicKeys();
 		boolean valid = false;
 
 		for (PublicKey publicKey : keys) {
-			valid = RSAEncryption.verifySign(decryptedToken, m.getSignature(), publicKey);
+			valid = RSAEncryption.verifySign(decryptedToken, m.getSignature(),
+					publicKey);
 			if (valid) {
 				break;
 			}
@@ -205,8 +200,6 @@ public class GatewayServlet extends HttpServlet {
 	public Fetcher getFetcher() {
 		return fetcher;
 	}
-
-
 
 	public void setFetcher(Fetcher fetcher) {
 		this.fetcher = fetcher;
