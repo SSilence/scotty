@@ -15,8 +15,8 @@
 ##### END of preliminary checks #######
 
 
-# Handle manual control parameters like start, stop, status, restart, etc.
-SCOTTY_DIR=../bin
+# Specify here the folder where soctty-gateway-jar-with-dependencies.jar is located.
+SCOTTY_DIR=./scotty-gateway
 
 case "$1" in
   start)
@@ -24,20 +24,19 @@ case "$1" in
 
     echo -n $"Starting scotty daemon: "
     echo
-	$JAVA_HOME/bin/java -cp $SCOTTY_DIR/libs scotty.StandaloneGatewayMain &
+	$JAVA_HOME/bin/java -jar $SCOTTY_DIR/scotty-gateway-jar-with-dependencies.jar &
+	export SCOTTY_PID=$!
     echo
     ;;
 
   stop)
     # Stop daemons.
     echo -n $"Shutting down scotty: "
-    
+    kill -9 $SCOTTY_PID
     echo
-
-    # Do clean-up works here like removing pid files from /var/run, etc.
     ;;
   status)
-    
+    ps -p $SCOTTY_PID|tail -1
 
     ;;
   restart)
