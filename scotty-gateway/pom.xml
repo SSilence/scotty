@@ -178,7 +178,7 @@
 
 
 			<build>
-				<finalName>scotty-gateway</finalName>
+				<finalName>scotty-gateway-gae</finalName>
 
 				<plugins>
 					<plugin>
