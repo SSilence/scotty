@@ -31,7 +31,7 @@ public class GatewayServlet extends HttpServlet {
 
 	private Map<String, Token> keyCache = new ConcurrentHashMap<String, GatewayServlet.Token>();
 
-	private Fetcher fetcher = new GoogleFetcher();
+	private Fetcher fetcher;
 
 	private static Logger log = Logger
 			.getLogger(GatewayServlet.class.getName());
@@ -62,7 +62,7 @@ public class GatewayServlet extends HttpServlet {
 					aesPassword);
 
 			// parse request, execute request..
-			byte[] response = fetcher.fetch(decodedMessage);
+			byte[] response = getFetcher().fetch(decodedMessage);
 
 			if (req.getParameter("enc") == null) {
 				byte[] cryptedResponse = AESEncryption.encrypt(response,
@@ -198,6 +198,9 @@ public class GatewayServlet extends HttpServlet {
 	}
 
 	public Fetcher getFetcher() {
+		if (fetcher == null) {
+			fetcher = new GoogleFetcher();
+		}
 		return fetcher;
 	}
 
