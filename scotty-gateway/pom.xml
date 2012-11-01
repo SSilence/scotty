@@ -168,6 +168,12 @@
 					<version>4.9</version>
 					<scope>test</scope>
 				</dependency>
+				<dependency>
+					<groupId>org.mortbay.jetty</groupId>
+					<artifactId>jetty</artifactId>
+					<version>6.1.26</version>
+					<scope>provided</scope>
+				</dependency>
 			</dependencies>
 
 
