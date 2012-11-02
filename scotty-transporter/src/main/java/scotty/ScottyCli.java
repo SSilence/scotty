@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
@@ -91,6 +92,11 @@ public class ScottyCli implements EventObserver {
 	 * CLI for gateways public key
 	 */
 	private static final String GATEWAYSPUBLICKEY_CMDLINE_PARAM = "gatewayspublickey";
+	
+	/**
+	 * CLI password for private key
+	 */
+	private static final String PRIVATEKEYPASS_CMDLINE_PARAM = "privatekeypassword";
 
 	/**
 	 * default private key
@@ -200,28 +206,33 @@ public class ScottyCli implements EventObserver {
 		KeyManager keyManager = KeyManager.getInstance();
 
 		if (commandLine.hasOption(PRIVATEKEY_CMDLINE_PARAM)) {
-			keyManager.readPrivateKey(
-					commandLine.getOptionValue(PRIVATEKEY_CMDLINE_PARAM), "");
+			String password = commandLine.hasOption(PRIVATEKEYPASS_CMDLINE_PARAM) ? commandLine.getOptionValue(PRIVATEKEYPASS_CMDLINE_PARAM) : "";
+			if(password==null) {
+				System.out.print("password for private key: ");
+				password = new String(System.console().readPassword());
+			}
+			keyManager.readPrivateKey(commandLine.getOptionValue(PRIVATEKEY_CMDLINE_PARAM), password);
+			log.info("Use given private key " + commandLine.getOptionValue(PRIVATEKEY_CMDLINE_PARAM));
 		} else {
 			keyManager.readPrivateKey(DEFAULT_PRIVATEKEY, "");
 		}
 
 		if (commandLine.hasOption(PUBLICKEY_CMDLINE_PARAM)) {
-			keyManager.readPublicKey(commandLine
-					.getOptionValue(PUBLICKEY_CMDLINE_PARAM));
+			keyManager.readPublicKey(commandLine.getOptionValue(PUBLICKEY_CMDLINE_PARAM));
+			log.info("Use given public key " + commandLine.getOptionValue(PUBLICKEY_CMDLINE_PARAM));
 		} else {
 			keyManager.readPublicKey(DEFAULT_PUBLICKEY);
 		}
 		if (commandLine.hasOption(GATEWAYSPUBLICKEY_CMDLINE_PARAM)) {
-			keyManager.readGatewaysPublicKey(commandLine
-					.getOptionValue(GATEWAYSPUBLICKEY_CMDLINE_PARAM));
+			keyManager.readGatewaysPublicKey(commandLine.getOptionValue(GATEWAYSPUBLICKEY_CMDLINE_PARAM));
+			log.info("Use given gateway public key " + commandLine.getOptionValue(GATEWAYSPUBLICKEY_CMDLINE_PARAM));
 		} else {
 			keyManager.readGatewaysPublicKey(DEFAULT_GATEWAYSPUBLICKEY);
 		}
 		if (commandLine.hasOption(TOKENTIMEOUT_CMDLINE_PARAM)) {
-			long tokenTimeout = Long.parseLong(commandLine
-					.getOptionValue(TOKENTIMEOUT_CMDLINE_PARAM));
+			long tokenTimeout = Long.parseLong(commandLine.getOptionValue(TOKENTIMEOUT_CMDLINE_PARAM));
 			keyManager.setMaxValidityOfToken(tokenTimeout);
+			log.info("Use given token timeout " + commandLine.getOptionValue(TOKENTIMEOUT_CMDLINE_PARAM));
 		}
 
 	}
@@ -241,7 +252,10 @@ public class ScottyCli implements EventObserver {
 				"Local port, where scotty listens for requests");
 		opts.addOption(CREATEKEY_CMDLINE_PARAM, false, "Create new KeyPair");
 		opts.addOption(PRIVATEKEY_CMDLINE_PARAM, true, "private key");
+		opts.addOption(OptionBuilder.hasOptionalArg().withDescription("private key password (if one was set)").create(PRIVATEKEYPASS_CMDLINE_PARAM));
 		opts.addOption(PUBLICKEY_CMDLINE_PARAM, true, "public key");
+		opts.addOption(GATEWAYSPUBLICKEY_CMDLINE_PARAM, true, "gateways public key");
+		
 		opts.addOption(DISABLE_ENCRYPTION_CMDLINE_PARAM, false,
 				"disable encryption");
 		opts.addOption(TOKENTIMEOUT_CMDLINE_PARAM, true,

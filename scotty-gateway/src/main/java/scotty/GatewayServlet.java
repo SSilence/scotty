@@ -27,6 +27,22 @@ import scotty.fetcher.GoogleFetcher;
 
 public class GatewayServlet extends HttpServlet {
 
+	/**
+	 * default private key
+	 */
+	private static final String DEFAULT_PRIVATEKEY = "resources:gw-defaultprivatekey";
+
+	/**
+	 * default public key
+	 */
+	private static final String DEFAULT_PUBLICKEY = "resources:gw-defaultpublickey";
+
+	/**
+	 * default client public keys
+	 */
+	private static final String DEFAULT_CLIENTSPUBLICKEY = "resources:clients";
+	
+	
 	private KeyManager km = KeyManager.getInstance();
 
 	private Map<String, Token> keyCache = new ConcurrentHashMap<String, GatewayServlet.Token>();
@@ -37,16 +53,17 @@ public class GatewayServlet extends HttpServlet {
 			.getLogger(GatewayServlet.class.getName());
 
 	public GatewayServlet() {
-		try {
-			km.readPublicKey("resources:gw-defaultpublickey");
-			km.readPrivateKey("resources:gw-defaultprivatekey", null);
-			km.readClientPublicKey("resources:clients");
-
-		} catch (CryptoException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		// load default keys if no one was set
+		initializeDefaultKeys();
+		
+	}
+	
+	public GatewayServlet(boolean init) {
+		if(init) {
+			initializeDefaultKeys();
 		}
 	}
+
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -128,7 +145,7 @@ public class GatewayServlet extends HttpServlet {
 		byte[] cryptedToken = Base64.decodeBase64(m.getCryptedToken());
 		// token mit privkey entschluesseln.
 		byte[] decryptedToken = RSAEncryption.decrypt(cryptedToken,
-				km.getPrivateKey());
+				getKm().getPrivateKey());
 		String tokenAndTimestamp = new String(decryptedToken);
 
 		String[] tokenAndTimestampArr = tokenAndTimestamp.split("\\|");
@@ -175,7 +192,7 @@ public class GatewayServlet extends HttpServlet {
 	 */
 	public void checkSignature(byte[] decryptedToken, Message m)
 			throws CryptoException {
-		List<PublicKey> keys = km.getClientPublicKeys();
+		List<PublicKey> keys = getKm().getClientPublicKeys();
 		boolean valid = false;
 
 		for (PublicKey publicKey : keys) {
@@ -190,6 +207,25 @@ public class GatewayServlet extends HttpServlet {
 			throw new CryptoException("Signature is not valid");
 		}
 
+	}
+	
+	protected void initializeDefaultKeys() {	
+		try {
+			if(getKm().getPublicKey()==null) {
+				getKm().readPublicKey(DEFAULT_PUBLICKEY);
+			}
+			
+			if(getKm().getPrivateKey()==null) {
+				getKm().readPrivateKey(DEFAULT_PRIVATEKEY, null);
+			}
+			
+			if(getKm().getClientPublicKeys()==null || getKm().getClientPublicKeys().size()==0) {
+				getKm().readClientPublicKey(DEFAULT_CLIENTSPUBLICKEY);
+			}
+		} catch (CryptoException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	class Token {
@@ -206,5 +242,13 @@ public class GatewayServlet extends HttpServlet {
 
 	public void setFetcher(Fetcher fetcher) {
 		this.fetcher = fetcher;
+	}
+
+	public KeyManager getKm() {
+		return km;
+	}
+
+	public void setKm(KeyManager km) {
+		this.km = km;
 	}
 }
