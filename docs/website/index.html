@@ -135,12 +135,12 @@
 
                     <p>
                         The installation is very easy. Download our compiled jar and war files. At first you have to start the Scotty Gateway on your local server.
-                        Execute the <strong>scotty-gateway-0.0.1-SNAPSHOT.jar</strong> and set the port and other settings as parameter: <code>
-                            java -jar scotty-gateway-0.0.1-SNAPSHOT.jar</code>
+                        Execute the <strong>scotty-gateway-standalone-0.9.jar</strong> and set the port and other settings as parameter: <code>
+                            java -jar scotty-gateway-standalone-0.9.jar</code>
 
                         On your local computer in the censored network you just have to start the local scotty proxy:
                         <code>
-                            java -jar scotty-transporter-0.0.1-SNAPSHOT.jar -p 8008 -g http://www.your-gateway-url.com:8008 -proxyHost proxy.yourcompany.de -proxyPort 8080</code>
+                            java -jar scotty-transporter-0.9.jar -p 8008 -g http://www.your-gateway-url.com:8008 -proxyHost proxy.yourcompany.de -proxyPort 8080</code>
 
                         After this two steps scotty is ready. You just have to set the proxy settings in your browser to localhost and the configured port (in this example 8008).
                     </p>
@@ -152,7 +152,7 @@
                         <h2>Configuration</h2>
 
                         <p>
-                            <u>Following configuration parameters are available for <strong>scotty proxy</strong> scotty-transporter-0.0.1-SNAPSHOT.jar</u>
+                            <u>Following configuration parameters are available for <strong>scotty proxy</strong> scotty-transporter-0.9.jar</u>
                         </p>
                         <br>
                         <table>
@@ -197,7 +197,7 @@
                         <br>
                         <br>
                         <p>
-                            <u>Following configuration parameters are available for <strong>scotty gateway</strong> scotty-gateway-0.0.1-SNAPSHOT.jar</u>
+                            <u>Following configuration parameters are available for <strong>scotty gateway</strong> scotty-gateway-standalone-0.9.jar</u>
                         </p>
                         <br>
                         <table>
@@ -237,7 +237,7 @@
                             <li>
                                 Generate KeyPair for your local proxy by using the command line parameter c:
                                 <code>
-                                    #&gt;java -jar scotty-transporter-0.0.1-SNAPSHOT.jar -c
+                                    #&gt;java -jar scotty-transporter-0.9.jar -c
                                     <br />
                                     filename of private key: proxyprivatekey
                                     <br />
@@ -263,13 +263,13 @@
                             <li>
                                 Now start the gateway with the generated keys:
                                 <code>
-                                    java -jar scotty-gateway-0.0.1-SNAPSHOT.jar -privatekey c:/tmp/gatewayprivatekey -publickey c:/tmp/gatewaypublickey -clientspublickeys c:/tmp/proxypublickey -privatekeypassword yourpass
+                                    java -jar scotty-gateway-standalone-0.9.jar -privatekey c:/tmp/gatewayprivatekey -publickey c:/tmp/gatewaypublickey -clientspublickeys c:/tmp/proxypublickey -privatekeypassword yourpass
                                 </code>
                             </li>
                             <li>
                                 In the censored network we start our local scotty transporter proxy with following options:
                                 <code>
-                                    java -jar scotty-transporter-0.0.1-SNAPSHOT.jar -g http://localhost:9000 -privatekey c:/tmp/proxyprivatekey -publickey c:/tmp/proxypublickey -gatewayspublickey c:/tmp/gatewaypublickey -privatekeypassword yourpass
+                                    java -jar scotty-transporter-0.9.jar -g http://localhost:9000 -privatekey c:/tmp/proxyprivatekey -publickey c:/tmp/proxypublickey -gatewayspublickey c:/tmp/gatewaypublickey -privatekeypassword yourpass
                                 </code>
                             </li>
                         </ol>
@@ -319,10 +319,13 @@
                     <h1>Download</h1>
                     <ul>
                         <li>
-                            <a href="">scotty-gateway-0.0.1-SNAPSHOT.jar (3 MB)</a><span style="font-size:0.8em;color:#999"> the scotty gateway script</span>
+                            <a href="https://github.com/downloads/SSilence/scotty/scotty-gateway-standalone-0.9.jar">scotty-gateway-standalone-0.9.jar (3.6 MB)</a><span style="font-size:0.8em;color:#999"> the scotty gateway script</span>
                         </li>
                         <li>
-                            <a href="">scotty-transporter-0.0.1-SNAPSHOT.jar (2 MB)</a><span style="font-size:0.8em;color:#999"> the local scotty proxy script</span>
+                            <a href="https://github.com/downloads/SSilence/scotty/scotty-transporter-0.9.jar">scotty-transporter-0.9.jar (2.8 MB)</a><span style="font-size:0.8em;color:#999"> the local scotty proxy script</span>
+                        </li>
+						<li>
+                            <a href="https://github.com/downloads/SSilence/scotty/scotty-gateway-gae-0.9.zip">scotty-gateway-gae-0.9.zip (7.8 MB)</a><span style="font-size:0.8em;color:#999"> gateway script for Google AppEngine</span>
                         </li>
                     </ul>
 
@@ -342,7 +345,7 @@
                 <p>
                     Scotty is a private and non commercial project of
                     <br />
-                    Florian Fuchs
+                    Florian Fuchs (<a href="mailto:flo@scotty-transporter.org">flo@scotty-transporter.org</a>) 
                     <br />
                     Tobias Zeising (<a href="mailto:tobias.zeising@aditu.de">tobias.zeising@aditu.de</a> &bullet; <a href="http://www.aditu.de">http://www.aditu.de</a>)
                     <br>
@@ -366,6 +369,21 @@
                 <a style="float:none; text-decoration: none; border: 0px;" class="scroll" href="#header"><img id="logo" src="images/logo_small.png"></a>
             </div>
         </div>
+		
+		
+		
+		<!-- Piwik --> 
+<script type="text/javascript">
+var pkBaseURL = (("https:" == document.location.protocol) ? "https://piwik.aditu.de/" : "http://piwik.aditu.de/");
+document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+</script><script type="text/javascript">
+try {
+var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 12);
+piwikTracker.trackPageView();
+piwikTracker.enableLinkTracking();
+} catch( err ) {}
+</script><noscript><p><img src="http://piwik.aditu.de/piwik.php?idsite=12" style="border:0" alt="" /></p></noscript>
+<!-- End Piwik Tracking Code -->
     </body>
 
 </html>
