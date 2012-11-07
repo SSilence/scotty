@@ -1,8 +1,17 @@
-Howto deploy scotty-gateway to Google Appengine:
+Howto deploy scotty-transporter to the GAE
+-------------------------------------------
 
-1. Update Version Number in scotty-gateway\src\main\webapp\WEB-INF\appengine-web.xml
-2. Run appcfg update to deploy to gae:
-<Google-Appengine-SDK>/bin/appcfg update <Path-to-target-scotty-gateway-war>
+Prerequisites:
+- Google Appengine Account
+- Google Appengine Java SDK (https://developers.google.com/appengine/downloads#Google_App_Engine_SDK_for_Java)
+- exploded scotty-gateway-gae folder
 
-sample:
-D:\springsource\sts-2.9.2.RELEASE\plugins\com.google.appengine.eclipse.sdkbundle_1.7.2.1\appengine-java-sdk-1.7.2.1\bin>appcfg update C:\Users\flo\git\scotty\scotty-gateway\target\scotty-gateway
+1. Create an application on the Google appengine
+2. Unzip scotty-gateway-gae-0.9.zip
+3. Edit the scotty-gateway-gae-0.9\WEB-INF\appengine-web.xml and insert your own application name and version on the cloud
+4. Execute the following command on the commandline to deploy to GAE
+
+<appengine-sdk>\bin>appcfg update scotty-gateway-gae
+
+and follow the dialog, where you have to enter your e-mail and passwort.
+Note: If you are using Google's two-factor authentication, you have to generate a application specific password for the appcfg script.
