@@ -30,6 +30,7 @@ a
 	background-repeat:no-repeat;
 	background-position-y: center;
 	background-position-x: 15px;
+	background-position: 15px center;
 	border:1px solid transparent;
 }
 
