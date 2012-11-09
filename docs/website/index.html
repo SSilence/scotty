@@ -1,262 +1,388 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
-	<head>
-		<link rel="stylesheet" href="style.css" type="text/css" media="screen">
-	</head>
-	<body>
-		<div class="header">
-		<div class="page">
-			<div class="logo"><img id="icon" src="images/icon.png"><img id="logo" src="images/logo.png"><p>We transfer what you can't</p><img src="images/os.png"></div>
-			
-		</div>
+    <head>
+        <link rel="stylesheet" href="style.css" type="text/css" media="screen">
+        <script src="jquery-1.8.2.min.js"></script>
+        <script>
+			jQuery(document).ready(function($) {
+
+				$(".scroll").click(function(event) {
+					event.preventDefault();
+					$('html,body').animate({
+						scrollTop : $(this.hash).offset().top
+					}, 500);
+				});
+			});
+
+        </script>
+		<title>scotty - we transfer what you can't</title>
+    </head>
+    <body>
+        <div class="header" id="header">
+            <div class="page">
+                <div class="logo"><img id="icon" src="images/icon.png"><img id="logo" src="images/logo.png">
+                    <p>
+                        We transfer what you can't
+                    </p><img src="images/os.png">
+                </div>
+
+            </div>
+
+            <div class="navigation">
+                <div class="page">
+                    <a id="features" class="scroll" href="#fanchor">Features</a><a id="howitworks" class="scroll" href="#hiwanchor">How it works</a><a id="documentation" class="scroll" href="#docanchor">Documentation</a><a id="download" class="scroll" href="#danchor">Download</a><a id="us" class="last scroll" href="#auanchor">About us</a>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <div class="page" style="margin-top: 0px; padding: 0px;"><a id="forums" href="forum">Forums</a></div>
+            <hr style="border:0px;">
+            <div class="page right" style="margin-top: 13px;">
+                <div class="text" id="fanchor">
+                    <h1 >Features</h1>
+
+                    <p>
+                        Scotty is a free opensource proxy software for bypassing filter and censorship systems. A free and unrestricted web is one of the greates values our society have.
+                        This software helps people who are victims of censorship of governments or private organizations.
+                    </p>
+
+                    <ul>
+                        <li>
+                            lightweight &amp; platform independent
+                        </li>
+                        <li>
+                            open source and free
+                        </li>
+                        <li>
+                            secure RSA based encription
+                        </li>
+                        <li>
+                            uses simple http (when you have internet access, scotty works)
+                        </li>
+                        <li>
+                            tunneling through any firewalls, webwashers, web filter
+                        </li>
+                        <li>
+                            no privacy issues: uses your own server
+                        </li>
+                        <li>
+                            supports Google AppEngine
+                        </li>
+                    </ul>
+
+                    <p>
+                        Scotty is licensed under the <a href="http://www.gnu.org/licenses/gpl-3.0.html">GPLv3 license</a>.
+                    </p>
+                </div>
+                <img src="images/content/features.png">
+            </div>
+            <hr id="hiwanchor">
+            <div class="page">
+                <div >
+                    <h1>How it works</h1>
+
+                    Scotty consits of two parts:
+                    <ul>
+                        <li>
+                            <strong>scotty gateway</strong>: a little gateway script, which runs on a reachable server in the uncensored internet
+                        </li>
+                        <li>
+                            <strong>scotty proxy</strong>: a little java executable, which runs on your local machine in the censored network
+                        </li>
+                    </ul>
+
+                    <p>
+                        At first you have to start the scotty gateway. This gateway runs on a system which ist inside the uncensored internet. For example your Windows Computer at home or
+                        the WebServer of your homepage. If you have no own server or all your computers are inside the censored network you can use the Google AppEngine (which is
+                        available for free).
+                    </p>
+
+                    <p>
+                        In the censored network you start the little scotty proxy, which is a small java executable. There you enter the URL of your gateway and the proxy of your network
+                        (e.g. the proxy server of your company). In your browser you set localhost as proxy.
+                    </p>
+
+                    <p>
+                        Thats it. Now you can surf anywhere you want. The communication between the scotty proxy and the scotty gateway is encrypted and uses a simple HTTP connection.
+                    </p>
+
+                </div>
+            </div>
+            <div style="text-align: center; float: none;">
+                <img style="margin-top: 0px; margin-bottom: 30px; margin-right: auto; margin-left: auto; float: none; text-align: center;" src="images/content/schema.png" alt="How it works sketch" />
+            </div>
+            <hr id="docanchor">
+            <div class="page right"><img src="images/content/documentation.png">
+                <div class="text">
+                    <h1>Documentation</h1>
+
+                    <h2>Requirements</h2>
+
+                    <ul>
+                        <li>
+                            Windows, Linux or Mac OS X
+                        </li>
+                        <li>
+                            Java Virtual Machine 6 or higher
+                        </li>
+                    </ul>
+
+                    <p>
+                        Scottys is programmed in Java. On your local machine and the gateway you need a Java Virtual Machine. For the Gateway we offer a expermiental PHP based version. This works on
+                        any WebHoster which supports PHP and allows web connections by using PHP.
+                    </p>
+
+                    <h2>Installation</h2>
+
+                    <p>
+                        The installation is very easy. Download our compiled jar and war files. At first you have to start the Scotty Gateway on your local server.
+                        Execute the <strong>scotty-gateway-standalone-0.9.jar</strong> and set the port and other settings as parameter: <code>
+                            java -jar scotty-gateway-standalone-0.9.jar</code>
+
+                        On your local computer in the censored network you just have to start the local scotty proxy:
+                        <code>
+                            java -jar scotty-transporter-0.9.jar -p 8008 -g http://www.your-gateway-url.com:8008 -proxyHost proxy.yourcompany.de -proxyPort 8080</code>
+
+                        After this two steps scotty is ready. You just have to set the proxy settings in your browser to localhost and the configured port (in this example 8008).
+                    </p>
+                    <div style="width:732px; z-index:2; float:left; margin-left:-250px; margin-top:20px;">
+                        <div style="text-align: center; float:none; padding-left:50px; width: 100%;"><img src="images/content/seperator_code.png">
+                        </div><div class="clear"></div>
+                        <br>
+                        <br>
+                        <h2>Configuration</h2>
+
+                        <p>
+                            <u>Following configuration parameters are available for <strong>scotty proxy</strong> scotty-transporter-0.9.jar</u>
+                        </p>
+                        <br>
+                        <table>
+                            <tr>
+                                <td class="first">g</td>
+                                <td class="second">The gateway url</td>
+                            </tr>
+                            <tr>
+                                <td class="first">p</td>
+                                <td class="second">The local port where scotty listens for browsers requests</td>
+                            </tr>
+                            <tr>
+                                <td class="first">proxyHost</td>
+                                <td class="second">The host of your current proxy (e.g. the proxy of your company)</td>
+                            </tr>
+                            <tr>
+                                <td class="first">proxyPort</td>
+                                <td class="second">The port of your current proxy</td>
+                            </tr>
+                            <tr>
+                                <td class="first">c</td>
+                                <td class="second">Create a new key pair for rsa encryption. The client and the server has a own rsa key pair.</td>
+                            </tr>
+                            <tr>
+                                <td class="first">privatekey</td>
+                                <td class="second">The private key file of the client. Without this option scotty uses the default private key.</td>
+                            </tr>
+                            <tr>
+                                <td class="first">publickey</td>
+                                <td class="second">The public key file of the client. Without this option scotty uses the default public key.</td>
+                            </tr>
+                            <tr>
+                                <td class="first">gatewayspublickey</td>
+                                <td class="second">The public key file of the gateway. Without this option scotty uses the default gateway public key.</td>
+                            </tr>
+                            <tr>
+                                <td class="first">privatekeypassword</td>
+                                <td class="second">The password for the private key (if one was set).</td>
+                            </tr>
+                        </table>
+
+                        <br>
+                        <br>
+                        <p>
+                            <u>Following configuration parameters are available for <strong>scotty gateway</strong> scotty-gateway-standalone-0.9.jar</u>
+                        </p>
+                        <br>
+                        <table>
+                            <tr>
+                                <td class="first">p</td>
+                                <td class="second">The port of the gateway.</td>
+                            </tr>
+                            <tr>
+                                <td class="first">privatekey</td>
+                                <td class="second">The private key file of the gateway. Without this option scotty uses the default private key.</td>
+                            </tr>
+                            <tr>
+                                <td class="first">publickey</td>
+                                <td class="second">The public key file of the gateway. Without this option scotty uses the default public key.</td>
+                            </tr>
+                            <tr>
+                                <td class="first">clientspublickeys</td>
+                                <td class="second">The file with all public keys of the allowed clients. Without this option scotty uses the default clients public keys.</td>
+                            </tr>
+                            <tr>
+                                <td class="first">privatekeypassword</td>
+                                <td class="second">The password for the private key (if one was set).</td>
+                            </tr>
+                        </table>
+                        <br>
+                        <br>
+                        <h2>How to create own Key Pairs</h2>
+
+                        <p>
+                            You can generate easily your own keys. Otherwise you use the default keys which encrypts the data but people who know about scotty can decrypt your communication.
+                        </p>
+                        <p>
+                            The gateway and the local proxy has their own key pairs. You have to generate a key pair (private and public key) for each one. Then the gateway has to know the
+                            public key of the client and the client must know the public key of the gateway.
+                        </p>
+                        <ol>
+                            <li>
+                                Generate KeyPair for your local proxy by using the command line parameter c:
+                                <code>
+                                    #&gt;java -jar scotty-transporter-0.9.jar -c
+                                    <br />
+                                    filename of private key: proxyprivatekey
+                                    <br />
+                                    filename of public key: proxypublickey
+                                    <br />
+                                    password for private key:
+                                    <br />
+                                    key pair successfully generated
+                                    <br />
+                                    private key successfully saved
+                                    <br />
+                                    public key successfully saved
+                                    <br />
+                                    private key successfully read
+                                    <br />
+                                    public key successfully read
+                                </code>
+                            </li>
+                            <li>
+                                Repeat this for the key pair of the gateway. For example we generate the keys c:\tmp\gatewayprivatekey and c:\tmp\gatewaypublickey for the gateway
+                                the keys c:/tmp/proxyprivatekey and c:/tmp/proxypublickey for the scotty transporter proxy.
+                            </li>
+                            <li>
+                                Now start the gateway with the generated keys:
+                                <code>
+                                    java -jar scotty-gateway-standalone-0.9.jar -privatekey c:/tmp/gatewayprivatekey -publickey c:/tmp/gatewaypublickey -clientspublickeys c:/tmp/proxypublickey -privatekeypassword yourpass
+                                </code>
+                            </li>
+                            <li>
+                                In the censored network we start our local scotty transporter proxy with following options:
+                                <code>
+                                    java -jar scotty-transporter-0.9.jar -g http://localhost:9000 -privatekey c:/tmp/proxyprivatekey -publickey c:/tmp/proxypublickey -gatewayspublickey c:/tmp/gatewaypublickey -privatekeypassword yourpass
+                                </code>
+                            </li>
+                        </ol>
+
+                        <h2>Google AppEngine Tutorial</h2>
+
+                        Requirements:
+                        <ul>
+                            <li>
+                                Google Appengine Account
+                            </li>
+                            <li>
+                                Google Appengine Java SDK
+                            </li>
+                            <li>
+                                exploded scotty-gateway-gae folder
+                            </li>
+                        </ul>
+                        <ol>
+                            <li>
+                                Create an application on the Google appengine.
+                            </li>
+                            <li>
+                                Edit the scotty-gateway-gae\src\main\webapp\WEB-INF\appengine-web.xml and insert your own application name and version on the cloud.
+                            </li>
+                            <li>
+                                Execute the following command on the commandline.
+                            </li>
+                        </ol>
+                        <code>
+                            &lt;appengine-sdk&gt;\bin>appcfg update scotty-gateway-gae
+                        </code>
+                        and follow the dialog, where you have to enter your e-mail and password.
+                        <br />
+                        <b>Note:</b> If you are using Google's two-factor authentication, you have to generate an application specific password for the appcfg script.
+
+                    </div>
+
+                </div>
+            </div>
+            <div class="clear"></div>
+
+           
+            <div class="green" style="margin-top:30px;" id="danchor">
+            <div class="page left"  style="padding-top:40px; height: 160px; background-image: url('images/download_vector_bg.png'); background-repeat: no-repeat; background-position: top;">
+                <div class="text">
+                    <h1>Download</h1>
+                    <ul>
+                        <li>
+                            <a href="https://github.com/downloads/SSilence/scotty/scotty-gateway-standalone-0.9.jar">scotty-gateway-standalone-0.9.jar (3.6 MB)</a><span style="font-size:0.8em;color:#999"> the scotty gateway script</span>
+                        </li>
+                        <li>
+                            <a href="https://github.com/downloads/SSilence/scotty/scotty-transporter-0.9.jar">scotty-transporter-0.9.jar (2.8 MB)</a><span style="font-size:0.8em;color:#999"> the local scotty proxy script</span>
+                        </li>
+						<li>
+                            <a href="https://github.com/downloads/SSilence/scotty/scotty-gateway-gae-0.9.zip">scotty-gateway-gae-0.9.zip (7.8 MB)</a><span style="font-size:0.8em;color:#999"> gateway script for Google AppEngine</span>
+                        </li>
+                    </ul>
+
+                    <p>
+                        The source code of scotty can be found on <a href="https://github.com/SSilence/scotty">github</a>.
+                    </p>
+                </div>
+                <img src="images/content/download.png" style="margin-top: 20px;">
+            </div></div>
+        </div>
+
+        <hr  id="auanchor">
+        <div class="page right">
+            <div class="text" style="float: right;">
+                <h1>About us</h1>
+
+                <p>
+                    Scotty is a private and non commercial project of
+                    <br />
+                    Florian Fuchs (<a href="mailto:flo@scotty-transporter.org">flo@scotty-transporter.org</a>) 
+                    <br />
+                    Tobias Zeising (<a href="mailto:tobias.zeising@aditu.de">tobias.zeising@aditu.de</a> &bullet; <a href="http://www.aditu.de">http://www.aditu.de</a>)
+                    <br>
+                    Mhmood Zaidan <i>- design</i> (<a href="http://mhmoodz.com">MhmoodZ</a>)
+                </p>
+
+                <p>
+                    You can use our <a href="forum">support forum</a> for further questions or issues
+                </p>
+            </div><img src="images/content/us.png" style="margin-left: 80px; margin-top: 30px; margin-right: 0px;">
+        </div>
+
+        <div class="clear"></div>
+        <div class="footer">
+            <div class="page">
+                <p style="display:block; float:left;">
+                    All rights are reserved
+                </p>
+                <a id="twitter" href="http://twitter.com/zuzzlwuzzl"> </a>
+
+                <a style="float:none; text-decoration: none; border: 0px;" class="scroll" href="#header"><img id="logo" src="images/logo_small.png"></a>
+            </div>
+        </div>
 		
-		<div class="navigation">
-			<div class="page">
-				<a id="features" href="#">Features</a><a id="code" href="#">Code</a><a id="documentation" href="#">Documentation</a><a id="download" class="last" href="#">Download</a>
-			</div>
-		</div>
-		</div>
-		<div class="content">
-			<div class="page right">
-				<div class="text">
-					<h1>Features</h1>
+		<!-- Piwik --> 
+		<script type="text/javascript">
+		var pkBaseURL = (("https:" == document.location.protocol) ? "https://piwik.aditu.de/" : "http://piwik.aditu.de/");
+		document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+		</script><script type="text/javascript">
+		try {
+		var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 12);
+		piwikTracker.trackPageView();
+		piwikTracker.enableLinkTracking();
+		} catch( err ) {}
+		</script><noscript><p><img src="http://piwik.aditu.de/piwik.php?idsite=12" style="border:0" alt="" /></p></noscript>
+		<!-- End Piwik Tracking Code -->
+    </body>
 
-					<p>Scotty is a free opensource proxy software for bypassing filter and censorship systems. A free and unrestricted web is one of the greates values our society have.
-					This software helps people who are victims of censorship of governments or private organizations.</p>
-					
-					<ul>
-						<li>lightweight &amp; platform independent</li>
-						<li>open source and free</li>
-						<li>secure RSA based encription</li>
-						<li>uses simple http (when you have internet access, scotty works)</li>
-						<li>tunneling through any firewalls, webwashers, web filter</li>
-						<li>no privacy issues: uses your own server</li>
-						<li>supports Google AppEngine</li>
-					</ul>
-					
-					<p>Scotty is licensed under the <a href="http://www.gnu.org/licenses/gpl-3.0.html">GPLv3 license</a>.</p>
-				</div>
-				<img src="images/content/code.png">
-			</div>
-			<hr>
-			<div class="page">
-				<div >
-					<h1>How it works</h1>
-					
-						Scotty consits of two parts:
-						<ul>
-							<li><strong>scotty gateway</strong>: a little gateway script, which runs on a reachable server in the uncensored internet</li>
-							<li><strong>scotty proxy</strong>: a little java executable, which runs on your local machine in the censored network</li>
-						</ul>
-					
-						<p>
-						At first you have to start the scotty gateway. This gateway runs on a system which ist in the uncensored internet. For example your Windows Computer at home or
-						the WebServer of your homepage. If you have no own server or all your computers are inside the censored network you can use the Google AppEngine (which is 
-						available for free).
-						</p>
-						
-						<p>
-						In the censored network you start the little scotty proxy, which is a small java executable. There you enter the URL of your gateway and the proxy of your network 
-						(e.g. the proxy server of your company). In your browser you set localhost as proxy.
-						</p>
-						
-						<p>
-						Thats it. Now you can surf anywhere you want. The communication between the scotty proxy and the scotty gateway is encrypted and uses a simple HTTP connection.
-						</p>
-					
-					<p>
-						<img src="schema.png" alt="How it works sketch" />
-					</p>
-				</div>
-			</div>
-			<hr>
-			<div class="page right">
-				<div class="text">
-					<h1>Documentation</h1>
-
-					<h2>Requirements</h2>
-					
-					<ul>
-						<li>Windows, Linux or Mac OS X</li>
-						<li> Java Virtual Machine 6 or higher</li>
-					</ul>
-					
-					<p>
-					Scottys is programmed in Java. On your local machine and the gateway you need a Java Virtual Machine. For the Gateway we offer a expermiental PHP based version. This works on
-					any WebHoster which supports PHP and allows web connections by using PHP.
-					</p>
-					
-					
-					<h2>Installation</h2>
-					
-					<p>
-						The installation is very easy. Download our compiled jar and war files. At first you have to start the Scotty Gateway on your local server.
-						Execute the <strong>scotty-gateway-0.0.1-SNAPSHOT.jar</strong> and set the port and other settings as parameter:
-						<code>java -jar scotty-gateway-0.0.1-SNAPSHOT.jar</code>
-						
-						On your local computer in the censored network you just have to start the local scotty proxy:
-						<code>java -jar scotty-transporter-0.0.1-SNAPSHOT.jar -p 8008 -g http://www.your-gateway-url.com:8008 -proxyHost proxy.yourcompany.de -proxyPort 8080</code>
-						
-						After this two steps scotty is ready. You just have to set the proxy settings in your browser to localhost and the configured port (in this example 8008).
-					</p>
-					
-					<h2>Configuration</h2>
-					
-					<p>Following configuration parameters are available for <strong>scotty proxy</strong> scotty-transporter-0.0.1-SNAPSHOT.jar</p>
-					<table>
-						<tr>
-							<td>g</td>
-							<td>The gateway url</td>
-						</tr>
-						<tr>
-							<td>p</td>
-							<td>The local port where scotty listens for browsers requests</td>
-						</tr>
-						<tr>
-							<td>proxyHost</td>
-							<td>The host of your current proxy (e.g. the proxy of your company)</td>
-						</tr>
-						<tr>
-							<td>proxyPort</td>
-							<td>The port of your current proxy</td>
-						</tr>
-						<tr>
-							<td>c</td>
-							<td>Create a new key pair for rsa encryption. The client and the server has a own rsa key pair.</td>
-						</tr>
-						<tr>
-							<td>privatekey</td>
-							<td>The private key file of the client. Without this option scotty uses the default private key.</td>
-						</tr>
-						<tr>
-							<td>publickey</td>
-							<td>The public key file of the client. Without this option scotty uses the default public key.</td>
-						</tr>
-						<tr>
-							<td>gatewayspublickey</td>
-							<td>The public key file of the gateway. Without this option scotty uses the default gateway public key.</td>
-						</tr>
-						<tr>
-							<td>privatekeypassword</td>
-							<td>The password for the private key (if one was set).</td>
-						</tr>
-					</table>
-					
-					
-					<p>Following configuration parameters are available for <strong>scotty gateway</strong> scotty-gateway-0.0.1-SNAPSHOT.jar</p>
-					<table>
-						<tr>
-							<td>p</td>
-							<td>The port of the gateway.</td>
-						</tr>
-						<tr>
-							<td>privatekey</td>
-							<td>The private key file of the gateway. Without this option scotty uses the default private key.</td>
-						</tr>
-						<tr>
-							<td>publickey</td>
-							<td>The public key file of the gateway. Without this option scotty uses the default public key.</td>
-						</tr>
-						<tr>
-							<td>clientspublickeys</td>
-							<td>The file with all public keys of the allowed clients. Without this option scotty uses the default clients public keys.</td>
-						</tr>
-						<tr>
-							<td>privatekeypassword</td>
-							<td>The password for the private key (if one was set).</td>
-						</tr>
-					</table>
-					
-					<h2>How to create own Key Pairs</h2>
-					
-					<p>You can generate easily your own keys. Otherwise you use the default keys which encrypts the data but people who know about scotty can decrypt your communication.</p>
-					<p>The gateway and the local proxy has their own key pairs. You have to generate a key pair (private and public key) for each one. Then the gateway has to know the 
-					public key of the client and the client must know the public key of the gateway.</p>
-					<ol>
-						<li>
-							Generate KeyPair for your local proxy by using the command line parameter c:
-							<code>
-								#&gt;java -jar scotty-transporter-0.0.1-SNAPSHOT.jar -c<br />
-								filename of private key: proxyprivatekey<br />
-								filename of public key: proxypublickey<br />
-								password for private key:<br />
-								key pair successfully generated<br />
-								private key successfully saved<br />
-								public key successfully saved<br />
-								private key successfully read<br />
-								public key successfully read
-							</code>
-						</li>
-						<li>
-							Repeat this for the key pair of the gateway. For example we generate the keys c:\tmp\gatewayprivatekey and c:\tmp\gatewaypublickey for the gateway
-							the keys c:/tmp/proxyprivatekey and c:/tmp/proxypublickey for the scotty transporter proxy.
-						</li>
-						<li>
-							Now start the gateway with the generated keys:
-							<code>
-								java -jar scotty-gateway-0.0.1-SNAPSHOT.jar -privatekey c:/tmp/gatewayprivatekey -publickey c:/tmp/gatewaypublickey -clientspublickeys c:/tmp/proxypublickey -privatekeypassword yourpass
-							</code>
-						</li>
-						<li>
-							In the censored network we start our local scotty transporter proxy with following options:
-							<code>
-								java -jar scotty-transporter-0.0.1-SNAPSHOT.jar -g http://localhost:9000 -privatekey c:/tmp/proxyprivatekey -publickey c:/tmp/proxypublickey -gatewayspublickey c:/tmp/gatewaypublickey -privatekeypassword yourpass
-							</code>
-						</li>
-					</ol>
-					
-					
-					<h2>Google AppEngine Tutorial</h2>
-					
-					Will follow soon
-					
-				</div>
-				<img src="images/content/documentation.png">
-				
-							<div class="clear"></div>
-
-				<hr>
-				<div class="page left">
-					<div class="text">
-						<h1>Download</h1>
-						<ul>
-							<li><a href="">scotty-gateway-0.0.1-SNAPSHOT.jar (3 MB)</a> <span style="font-size:0.8em;color:#999">the scotty gateway script</span></li>
-							<li><a href="">scotty-transporter-0.0.1-SNAPSHOT.jar (2 MB)</a> <span style="font-size:0.8em;color:#999">the local scotty proxy script</span></li>
-						</ul>
-
-						<p>The source code of scotty can be found on <a href="https://github.com/SSilence/scotty">github</a>.</p>
-					</div>
-					<img src="images/content/features.png">
-				</div>
-				
-				<hr />
-				<div class="page right">
-					<div class="text">
-						<h1>About us</h1>
-
-						<p>Scotty is a private and non commercial project of <br />
-							Florian Fuchs (<a href="mailto:flo@domain.org">flo@domain.org</a>) <br />
-							Tobias Zeising (<a href="mailto:tobias.zeising@aditu.de">tobias.zeising@aditu.de</a> &bullet; <a href="http://www.aditu.de">http://www.aditu.de</a>).</p>
-						
-						<p>Feel free to contact us on questions and issues.</p>
-					</div>
-					<img src="images/content/code.png">
-				</div>
-			<hr>
-		</div>
-		<div class="clear"></div>
-		<div class="footer">
-			<div class="page">
-				<p style="display:block; float:left;">
-					All rights are reserved 
-				</p>
-				<a id="twitter" href="http://twitter.com/zuzzlwuzzl"></a>
-				<a id="github" href="https://github.com/SSilence/scotty"></a>
-				<!--<a id="facebook" href="http://facebook.com"></a>-->
-				
-				<img id="logo" src="images/logo_small.png">
-			</div>
-		</div>
-	</body>
-	
 </html>
