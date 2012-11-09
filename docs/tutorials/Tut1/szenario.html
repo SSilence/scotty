@@ -1,0 +1,156 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.4  (Win32)">
+	<META NAME="CREATED" CONTENT="20121108;19131580">
+	<META NAME="CHANGED" CONTENT="20121109;18324227">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { margin: 2cm }
+		P { margin-bottom: 0.21cm }
+		H1 { margin-bottom: 0.21cm }
+		H1.western { font-family: "Arial", sans-serif; font-size: 16pt }
+		H1.cjk { font-family: "Microsoft YaHei"; font-size: 16pt }
+		H1.ctl { font-family: "Mangal"; font-size: 16pt }
+		A:link { so-language: zxx }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="de-DE" DIR="LTR">
+<P STYLE="margin-bottom: 0cm">Szenarien der Nutzung von scotty</P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<H1 CLASS="western">Dein PC ist hinter einem filternden Proxy
+(Censorship)</H1>
+<P STYLE="margin-bottom: 0cm">Im ersten Fall verf&uuml;gt meine
+Workstation ausschlie&szlig;lich &uuml;ber einen zentralen und
+filternden HTTP Proxy Zugang zum Internet. H&auml;ufig ist selbst
+dieser Zugriff auf einen kleinen Benutzerkreis beschr&auml;nkt  und
+erfordert die Eingabe von Benutzernamen und Passwort. 
+</P>
+<P STYLE="margin-bottom: 0cm">Der HTTP Proxy filtert nun leider
+Webseiten, die wir aufgrund der Meinung des HTTP Proxy Betreibers
+nicht betreten d&uuml;rfen. Das bedeutet wir k&ouml;nnen dringend
+ben&ouml;tigte Informationen nicht erreichen oder Nachrichten, welche
+wir sicher und aus einem vertrauensw&uuml;rdigen Netz senden m&uuml;ssen,
+nicht absetzen.</P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><I><B>Scotty, we transport what you
+can't &ndash; und bringt uns damit &uuml;berall hin.</B></I></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm">Scotty bringt Abhilfe und &ouml;ffnet
+das Netz. Im folgenden wird scotty f&uuml;r das beschriebene Szenario
+installiert und konfiguriert. 
+</P>
+<P STYLE="margin-bottom: 0cm"><IMG SRC="szenario_html_1b7f7be.png" NAME="Grafik1" ALIGN=LEFT WIDTH=848 HEIGHT=279 BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0cm">Folgende 2 Dateien m&uuml;ssen daf&uuml;r
+heruntergeladen und wie beschrieben gestartet werden.</P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm">1.  <B>Scotty transporter </B>&ndash;
+Ausgangspunkt im eingeschr&auml;nkten Netz</P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm">scotty transporter wird auf dem Rechner
+mit eingeschr&auml;nktem  Internetzugang gestartet. Scotty startet
+einen lokalen Proxyserver und lauscht standardm&auml;&szlig;ig auf
+Port 8008 auf eingehende Anfragen des Browsers.</P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm">Folgende Schritte m&uuml;ssen also
+ausgef&uuml;hrt werden:</P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<OL>
+	<LI><P STYLE="margin-bottom: 0cm">Download scotty-transporter.jar</P>
+	<LI><P STYLE="margin-bottom: 0cm">Starte scotty-transporter.jar
+	durch via Kommandozeile:</P>
+	<P STYLE="margin-bottom: 0cm">java -jar scotty-transporter.jar -g
+	[Gateway im freien Internet] -proxyHost [filternder Proxy]
+	-proxyPort [filternder Proxy port]</P>
+	<P STYLE="margin-bottom: 0cm"></P>
+</OL>
+<P STYLE="margin-bottom: 0cm">Im Beispiel sind die wichtigsten
+Parameter aufgef&uuml;hrt:</P>
+<P STYLE="margin-bottom: 0cm">-g Ist die Adresse des Gateways, d.h.
+Die IP/Domain und Port des Rechners auf dem
+scotty-gateway-standalone.jar gestartet wurde. 
+</P>
+<P STYLE="margin-bottom: 0cm">-proxyHost und -proxyPort ist der
+filternde Proxy und dessen Port, &uuml;ber den die Verbindung zum
+Gateway aufgebaut wird.</P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm">Nun muss nur noch der Proxy im Browser
+auf localhost:8008 umgestellt werden und die Kommunikation l&auml;uft
+&uuml;ber den scotty transporter. 
+</P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm">Scotty macht nun im Detail folgendes:</P>
+<OL>
+	<LI><P STYLE="margin-bottom: 0cm">scotty-transporter verschl&uuml;sselt
+	die urspr&uuml;ngliche Anfrage und schickt Sie an den filternden
+	HTTP Proxy</P>
+	<LI><P STYLE="margin-bottom: 0cm">der filternde Proxy kann kann die
+	Anfrage nicht analysieren und uns damit Seiten vorenthalten, er
+	leitet sie brav weiter an unseren scotty Gateway im freien Netz.</P>
+	<LI><P STYLE="margin-bottom: 0cm">scotty Gateway f&uuml;hrt die
+	Anfrage aus und gibt die Antwort wieder verschl&uuml;sselt an den
+	scotty transporter und damit an den Browser zur&uuml;ck.</P>
+</OL>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm">2.<B> scotty Gateway</B> &ndash; das
+Tor zur freien Welt</P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm">scotty Gateway  ist wohl die wichtigste
+Komponente von scotty. Dieses kleine Programm bezieht die Daten aus
+dem freien Internet. Der Gateway wird auf einem Rechner mit freien
+Internetzugang gestartet. Scotty lauscht dann standardm&auml;&szlig;ig
+auf Port 9000 auf eingehende Anfragen.</P>
+<P STYLE="margin-bottom: 0cm">Der scotty Gateway kann auch auf der
+Google Appengine deployed werden. scotty ist vollst&auml;ndig in Java
+implementiert und damit unabh&auml;ngig vom verwendeten
+Betriebssystem, solange eine Java Runtime von mindestens 1.6
+vorhanden ist. (L&auml;uft auch auf Steckdosen-PCs)</P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<OL>
+	<LI><P STYLE="margin-bottom: 0cm">Ben&ouml;tigt wird ein Gateway
+	PC/Server mit freien Internetzugang.</P>
+	<LI><P STYLE="margin-bottom: 0cm">Download
+	scotty-gateway-standlone.jar</P>
+	<LI><P STYLE="margin-bottom: 0cm">Starte
+	scotty-gateway-standalone.jar (durch Doppelklick oder via
+	Kommandozeile)</P>
+</OL>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm">Damit ist der Gateway gestartet und
+nimmt Anfragen entgegen.</P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm">Scotty erm&ouml;glicht den Zugang zu 
+unrechtm&auml;&szlig;ig gesperrten Internsetseiten und befriedigt
+damit das Grundbed&uuml;rfnis einer freien und offenen
+Informationswelt. 
+</P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm">Scotty darf ausschlie&szlig;lich
+angewendet werden, wenn die Seiten aufgrund von Zensur eines Regimes
+nicht verf&uuml;gbar sind. Scotty sollte ausdr&uuml;cklich nicht
+verwendet werden, um rechtm&auml;&szlig;ige Filtersysteme, wie Sie
+heute praktisch in jedem Unternehmen und jeder Organisation zu finden
+sind., zu umgehen.</P>
+</BODY>
+</HTML>
