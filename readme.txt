@@ -7,7 +7,7 @@ License: GPLv3
 Documentation
 -------------
 
-The documentation can be found on http://www.scotty-transporter.org
+The documentation can be found on http://www.scotty-transporter.org or here in the Wiki.
 
 
 -------
