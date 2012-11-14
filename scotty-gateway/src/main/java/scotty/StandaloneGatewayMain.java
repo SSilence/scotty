@@ -61,7 +61,7 @@ public class StandaloneGatewayMain {
 		
 		// parse command line params
 		CommandLine commandLine = handleCommandline(args);
-		loadKeys(commandLine, gatewayServlet.getKm());
+		loadKeys(commandLine, gatewayServlet.getKm(), gatewayServlet);
 		
 		int port = DEFAULT_PORT;
 		if (commandLine.hasOption(LOCALPORT_CMDLINE_PARAM)) {
@@ -99,7 +99,7 @@ public class StandaloneGatewayMain {
 	 * @param commandLine
 	 * @throws CryptoException
 	 */
-	private static void loadKeys(CommandLine commandLine, KeyManager keyManager) throws CryptoException {	
+	private static void loadKeys(CommandLine commandLine, KeyManager keyManager, GatewayServlet gatewayServlet) throws CryptoException {	
 		// read private key
 		if (commandLine.hasOption(PRIVATEKEY_CMDLINE_PARAM)) {
 			String password = commandLine.hasOption(PRIVATEKEYPASS_CMDLINE_PARAM) ? commandLine.getOptionValue(PRIVATEKEYPASS_CMDLINE_PARAM) : "";
@@ -109,18 +109,24 @@ public class StandaloneGatewayMain {
 			}
 			keyManager.readPrivateKey(commandLine.getOptionValue(PRIVATEKEY_CMDLINE_PARAM), password);
 			log.info("Use given private key "+ commandLine.getOptionValue(PRIVATEKEY_CMDLINE_PARAM));
+		} else {
+			gatewayServlet.initializeDefaultPrivateKey();
 		}
 
 		// read public key
 		if (commandLine.hasOption(PUBLICKEY_CMDLINE_PARAM)) {
 			keyManager.readPublicKey(commandLine.getOptionValue(PUBLICKEY_CMDLINE_PARAM));
 			log.info("Use given public key "+ commandLine.getOptionValue(PUBLICKEY_CMDLINE_PARAM));
+		} else {
+			gatewayServlet.initializeDefaultPublicKey();
 		}
 		
 		// read public keys of clients
 		if (commandLine.hasOption(CLIENTSPUBLICKEY_CMDLINE_PARAM)) {
 			keyManager.readClientPublicKey(commandLine.getOptionValue(CLIENTSPUBLICKEY_CMDLINE_PARAM));
 			log.info("Use given clients public key list "+ commandLine.getOptionValue(CLIENTSPUBLICKEY_CMDLINE_PARAM));
+		} else {
+			gatewayServlet.initializeDefaultClientPublicKeys();
 		}
 		
 		// set token timeout if given
