@@ -1,8 +1,12 @@
 package scotty.plugin;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.logging.Logger;
 
+import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.URIException;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.owasp.webscarab.httpclient.HTTPClient;
 import org.owasp.webscarab.model.HttpUrl;
 import org.owasp.webscarab.model.Request;
@@ -16,9 +20,9 @@ import scotty.util.UserAgentProvider;
 /**
  * This plugin intercepts the request/response and does the transformation,
  * specified by {@link RequestTransformer} and {@link ResponseTransformer}.
- * 
+ *
  * @author flo
- * 
+ *
  */
 public class TransformingProxyPlugin extends ProxyPlugin {
 
@@ -39,11 +43,16 @@ public class TransformingProxyPlugin extends ProxyPlugin {
 		this.gatewayUrl = gatewayUrl;
 	}
 
+	protected TransformingProxyPlugin() {
+
+	}
+
 	@Override
 	public String getPluginName() {
 		return "TransformingProxyPlugin";
 	}
 
+	@Override
 	public HTTPClient getProxyPlugin(HTTPClient in) {
 		return new Plugin(in);
 	}
@@ -82,7 +91,7 @@ public class TransformingProxyPlugin extends ProxyPlugin {
 			request.setMethod("POST");
 
 			if ("https".equalsIgnoreCase(url.getScheme())) {
-				request.setURL(new HttpUrl(gatewayUrl + "?ssl=true"));
+				request.setURL(createHttpsGatewayUrl(gatewayUrl));
 			} else {
 				request.setURL(gateway);
 			}
@@ -95,5 +104,15 @@ public class TransformingProxyPlugin extends ProxyPlugin {
 
 			return response;
 		}
+
+	}
+
+	public HttpUrl createHttpsGatewayUrl(String gatewayUrl)
+			throws MalformedURLException, URIException {
+		HttpMethod method = new GetMethod(gatewayUrl);
+		method.setQueryString("ssl=true");
+		String url = method.getURI().getEscapedURI();
+
+		return new HttpUrl(url);
 	}
 }
