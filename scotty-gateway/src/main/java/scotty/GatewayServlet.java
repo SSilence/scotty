@@ -210,15 +210,36 @@ public class GatewayServlet extends HttpServlet {
 	}
 	
 	protected void initializeDefaultKeys() {	
+		initializeDefaultPrivateKey();
+		initializeDefaultPublicKey();
+		initializeDefaultClientPublicKeys();
+	}
+	
+	public void initializeDefaultPublicKey() {
 		try {
 			if(getKm().getPublicKey()==null) {
 				getKm().readPublicKey(DEFAULT_PUBLICKEY);
 			}
 			
+		} catch (CryptoException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void initializeDefaultPrivateKey() {
+		try {
 			if(getKm().getPrivateKey()==null) {
 				getKm().readPrivateKey(DEFAULT_PRIVATEKEY, null);
 			}
-			
+		} catch (CryptoException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void initializeDefaultClientPublicKeys() {
+		try {
 			if(getKm().getClientPublicKeys()==null || getKm().getClientPublicKeys().size()==0) {
 				getKm().readClientPublicKey(DEFAULT_CLIENTSPUBLICKEY);
 			}
@@ -227,7 +248,7 @@ public class GatewayServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 	}
-
+	
 	class Token {
 		String aesPassword;
 		long timestamp;
