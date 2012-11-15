@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>scotty</groupId>
 	<artifactId>scotty</artifactId>
-	<version>0.9-SNAPSHOT</version>
+	<version>0.9.1-SNAPSHOT</version>
 	<name>scotty transporter</name>
 	<dependencies>
 		<dependency>
@@ -40,7 +40,7 @@
 		<dependency>
 			<groupId>scotty</groupId>
 			<artifactId>scotty-commons</artifactId>
-			<version>0.9-SNAPSHOT</version>
+			<version>0.9.1-SNAPSHOT</version>
 		</dependency>
 
 		<!-- Test -->
