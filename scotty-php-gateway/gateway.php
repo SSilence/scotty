@@ -27,7 +27,7 @@ $clientPublicKeys = array(
 );
 
 // directory where clients public keys are saved
-$dirClientPublicKeys = false;
+$dirClientPublicKeys = "clients";
 
 // optional error page which will be included
 $showErrorPage = false;
@@ -75,25 +75,22 @@ $useEncryption = true;
 // public key
 $publicKey = base64_decode($defaultPublicKey);
 if(file_exists("privatekey"))
-    $publicKey = base64_decode(file_get_contents("privatekey"));
+    $publicKey = base64_decode(file_get_contents("publickey"));
 
 // private key
 $privateKey = base64_decode($defaultPrivateKey);
 if(file_exists("publickey"))
-    $privateKey = base64_decode(file_get_contents("publickey"));
+    $privateKey = base64_decode(file_get_contents("privatekey"));
 
 // use clients public keys if directory was set
 if($dirClientPublicKeys!=false && file_exists($dirClientPublicKeys) && $handle = opendir($dirClientPublicKeys)) {
     $clientPublicKeys = array();
     while (false !== ($file = readdir($handle)))
-        if ($file != "." && $file != "..")
-            $clientPublicKeys[] = file_get_contents($dirClientPublicKeys . "/" . $file);
+        if ($file != "." && $file != "..") {
+            $clientPublicKeys[] = base64_decode(file_get_contents($dirClientPublicKeys . "/" . $file));
+		}
     closedir($handle);
 } 
-
-// decode clients public keys
-for($i=0;$i<count($clientPublicKeys);$i++)
-    $clientPublicKeys[$i] = base64_decode($clientPublicKeys[$i]);
 
 
 //
