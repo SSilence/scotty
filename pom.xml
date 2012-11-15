@@ -5,7 +5,7 @@
 	<artifactId>scotty</artifactId>
 	<version>0.9.1-SNAPSHOT</version>
 	<name>scotty parent</name>
-	
+	<packaging>pom</packaging>
 	
 	<modules>
 		<module>scotty-commons</module>
