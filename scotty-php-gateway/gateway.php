@@ -1,10 +1,10 @@
 <?php
 
 /**
- * PHP based Gateway.
+ * PHP based Gateway for scotty.
  * 
  * @author zeising.tobias <br>
- *         copyright (C) 2012, http://www.aditu.de, tobias.zeising@aditu.de
+ *         copyright (C) 2012, http://www.scotty-transporter.org, http://www.aditu.de, tobias.zeising@aditu.de
  */
 
 // configuration
@@ -25,9 +25,6 @@ $defaultPrivateKey = "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCkV8AaOe
 $clientPublicKeys = array(
     "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6WblNbhy7rgRWDBhaxJQmiSbj8H5r8CIGYCSDcIqmWz8/uh0IYGeWTaPMjWaYeAAOiCmPP8rJEv1t0s4/Vynoq5n/xrXQlTtt8GI0ekCqWNqUREsLISMxCj+jQ13FDMG+RD1SjQZQJJSD6kAH0D1OCbeOOv8wynL7LH4Qwm6q4y4TeD7AOYA6UHpBdJWC1zuFpp1yU2La6pmgqHxl/K1Muphl0NF0REKUksUPz0RIYs444lX/1XR64N5+5ljiN6tSuvk7JGEK3Dd0WsK8XIIRcWGoulYPrvm/cViT9jAbA/LZWm3Xss5slFhEG4BwRSzudV1LSeLbeKNqOV88CQzYQIDAQAB"
 );
-
-// directory where clients public keys are saved
-$dirClientPublicKeys = "clients";
 
 // optional error page which will be included
 $showErrorPage = false;
@@ -74,24 +71,13 @@ $useEncryption = true;
 
 // public key
 $publicKey = base64_decode($defaultPublicKey);
-if(file_exists("privatekey"))
-    $publicKey = base64_decode(file_get_contents("publickey"));
 
 // private key
 $privateKey = base64_decode($defaultPrivateKey);
-if(file_exists("publickey"))
-    $privateKey = base64_decode(file_get_contents("privatekey"));
 
-// use clients public keys if directory was set
-if($dirClientPublicKeys!=false && file_exists($dirClientPublicKeys) && $handle = opendir($dirClientPublicKeys)) {
-    $clientPublicKeys = array();
-    while (false !== ($file = readdir($handle)))
-        if ($file != "." && $file != "..") {
-            $clientPublicKeys[] = base64_decode(file_get_contents($dirClientPublicKeys . "/" . $file));
-		}
-    closedir($handle);
-} 
-
+// decode clients public keys
+for($i=0;$i<count($clientPublicKeys);$i++)
+    $clientPublicKeys[$i] = base64_decode($clientPublicKeys[$i]);
 
 //
 // load key cache
