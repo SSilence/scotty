@@ -1,6 +1,6 @@
 scotty transporter
 http://www.scotty-transporter.org
-Version 0.9
+Version 0.9.2
 License: GPLv3
 
 -------------
@@ -23,6 +23,14 @@ CHANGELOG
 
 Version 0.9
 * Initial Version with Standalone and Google Appengine Support
+
+Version 0.9.1
+* Bugfix: HTTPS works now correctly
+* Bugfix: Fix key loading Bug for Standalone Version
+
+Version 0.9.2
+* Improved PHP Gateway support
+* Add PHP Gateway usage documentation
 
 
 -------
