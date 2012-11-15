@@ -58,7 +58,7 @@ import org.owasp.webscarab.util.Glob;
 
 /**
  * Creates a new instance of URLFetcher
- * 
+ *
  * @author rdawes
  */
 public class URLFetcher implements HTTPClient {
@@ -97,11 +97,12 @@ public class URLFetcher implements HTTPClient {
 	 * Creates a new instance of URLFetcher
 	 */
 	public URLFetcher() {
+		_sslContextManager = new SSLContextManager();
 	}
 
 	/**
 	 * Tells URLFetcher which HTTP proxy to use, if any
-	 * 
+	 *
 	 * @param proxy
 	 *            The address or name of the proxy server to use for HTTP
 	 *            requests
@@ -117,7 +118,7 @@ public class URLFetcher implements HTTPClient {
 
 	/**
 	 * Tells URLFetcher which HTTPS proxy to use, if any
-	 * 
+	 *
 	 * @param proxy
 	 *            The address or name of the proxy server to use for HTTPS
 	 *            requests
@@ -135,7 +136,7 @@ public class URLFetcher implements HTTPClient {
 	 * Accepts an array of hostnames or domains for which no proxy should be
 	 * used. if the hostname begins with a period ("."), than all hosts in that
 	 * domain will ignore the configured proxies
-	 * 
+	 *
 	 * @param noproxy
 	 *            An array of hosts or domains for which no proxy should be
 	 *            used. Domains must start with a period (".")
@@ -173,11 +174,12 @@ public class URLFetcher implements HTTPClient {
 	 * additional thread. This is appropriate when the calling class is already
 	 * running in an independant thread, and must wait for the response before
 	 * continuing.
-	 * 
+	 *
 	 * @return the retrieved response
 	 * @param request
 	 *            the request to retrieve.
 	 */
+	@Override
 	public Response fetchResponse(Request request) throws IOException {
 		if (_response != null) {
 			_response.flushContentStream(); // flush the content stream, just in
