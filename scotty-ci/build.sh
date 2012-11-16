@@ -25,15 +25,21 @@ LOGFILE=$SCOTTY_LOGFILE
 # Profles to run:
 PROFILES[0]=
 PROFILES[1]="-P gae"
+LOCKFILE=.scotty_ci_lockfile
 
 echo ====\> `date`
-
+stat $LOCKFILE &>/dev/null
+LOCK=`echo $?`
 # pull git repo
 cd $PROJECT
 GIT_OUTPUT=`git pull`
-if [ "$GIT_OUTPUT" == "Already up-to-date."  ]; then
+if [ "$LOCK" == "0" ] || [ "$GIT_OUTPUT" == "Already up-to-date."  ]; then
 	echo $GIT_OUTPUT
+	if [ "$LOCK" == "0" ]; then
+		echo Lockile $LOCKFILE exists..build is currently running
+	fi
 else
+	touch $LOCKFILE
 	# make dirs, if not existing
 	mkdir -p $RELEASES_FOLDER
 	mkdir -p $RELEASES_FOLDER_ARCHIVE
@@ -57,4 +63,5 @@ else
 	do
 		ncftpput -T PART -u $REMOTE_USER -p $PASSWORD $HOSTNAME $REMOTE_DIR $i
 	done
+	rm $LOCKFILE
 fi
