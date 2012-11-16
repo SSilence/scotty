@@ -30,7 +30,8 @@ Version 0.9.1
 
 Version 0.9.2
 * Improved PHP Gateway support
-* Add PHP Gateway usage documentation
+* Improved PHP Gateway logging
+* Improve website documentation
 
 
 -------
