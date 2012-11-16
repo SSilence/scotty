@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>scotty</groupId>
 	<artifactId>scotty-gateway</artifactId>
-	<version>0.9.2</version>
+	<version>0.9.3-SNAPSHOT</version>
 	<name>scotty-gateway Maven Webapp</name>
 	<url>http://maven.apache.org</url>
 	<packaging>${packaging.type}</packaging>
@@ -48,7 +48,7 @@
 				<dependency>
 					<groupId>scotty</groupId>
 					<artifactId>scotty-commons</artifactId>
-					<version>0.9.2</version>
+					<version>0.9.3-SNAPSHOT</version>
 				</dependency>
 				<dependency>
 					<groupId>org.mortbay.jetty</groupId>
@@ -167,7 +167,7 @@
 				<dependency>
 					<groupId>scotty</groupId>
 					<artifactId>scotty-commons</artifactId>
-					<version>0.9.1-SNAPSHOT</version>
+					<version>0.9.3-SNAPSHOT</version>
 				</dependency>
 				<dependency>
 					<groupId>junit</groupId>

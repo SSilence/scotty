@@ -3,7 +3,7 @@
 /**
  * PHP based Gateway for scotty.
  * 
- * @version 0.9.2
+ * @version 0.9.3-SNAPSHOT
  * @author zeising.tobias <br>
  *         copyright (C) 2012, http://www.scotty-transporter.org, http://www.aditu.de, tobias.zeising@aditu.de
  */
