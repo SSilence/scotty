@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>scotty</groupId>
-	<artifactId>scotty</artifactId>
+	<artifactId>scotty-transporter</artifactId>
 	<version>0.9.3-SNAPSHOT</version>
 	<name>scotty transporter</name>
 	<dependencies>
@@ -94,7 +94,6 @@
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
-					<finalName>scotty-transporter-${project.version}</finalName>
 					<appendAssemblyId>false</appendAssemblyId>
 					<archive>
 						<manifest>
