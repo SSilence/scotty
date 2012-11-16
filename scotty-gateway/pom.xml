@@ -189,7 +189,7 @@
 
 
 			<build>
-				<finalName>scotty-gateway-gae</finalName>
+				<finalName>scotty-gateway-gae-${project.version}</finalName>
 
 				<plugins>
 					<plugin>
