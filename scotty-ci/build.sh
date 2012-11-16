@@ -30,6 +30,7 @@ LOCKFILE=.scotty_ci_lockfile
 echo ====\> `date`
 stat $LOCKFILE &>/dev/null
 LOCK=`echo $?`
+
 # pull git repo
 cd $PROJECT
 GIT_OUTPUT=`git pull`
