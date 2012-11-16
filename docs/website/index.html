@@ -138,29 +138,90 @@
                         any WebHoster which supports PHP and allows web connections by using PHP.
                     </p>
 
+					
                     <h2>Installation</h2>
+					
+					You have three options for installing the gateway:
+					<ul>
+						<li><strong>Java based gateway</strong>: You can use the Java based gateway which works on any operating system supporting Java. You just have to start a jar file on the Java VM.</li>
+						<li><strong>PHP based gateway</strong>: For owners of a own webserver or hosting service you can upload a single PHP file. This PHP script acts as gateway.</li>
+						<li><strong>Google AppEngine based gateway</strong>: You can also use the free Google AppEngine. This executes the java gateway in the Google cloud.</li>
+					</ul>
+					
+					
+                    <h2>Installation of the Java based gateway</h2>
 
                     <p>
-                        <strong>Java based gateway</strong>: The installation is very easy. Download our compiled jar and war files. At first you have to start the Scotty Gateway on your local server.
-                        Execute the <strong>scotty-gateway-standalone-0.9.1.jar</strong> and set the port and other settings as parameter: <code>
-                            java -jar scotty-gateway-standalone-0.9.1.jar</code>
+                        The installation is very easy. Download our compiled scotty-gateway-standalone-0.9.2.jar file. You have to start the Scotty Gateway on your own server.
+                        Execute the <strong>scotty-gateway-standalone-0.9.2.jar</strong> and set the port and other settings as parameter: <code>
+                            java -jar scotty-gateway-standalone-0.9.2.jar</code>
 					</p>
 					
-					<p style="margin-bottom:10px">
-						<strong>PHP based gateway</strong>: When you use the PHP based gateway then upload the gateway.php on your server (feel free to rename the file). 
+					
+					<h2>Installation of the PHP based gateway</h2>
+					
+					<p>
+						When you use the PHP based gateway then upload the gateway.php on your server (feel free to rename the file). 
 						Ensure that the folder where the gateway.php script is located is writeable (chmod). Otherwise the gateway will be very very slow.
 					</p>
 					
+					
+					<h2>Installation of the Google AppEngine based gateway</h2>
+					
 					<p>
-                        <strong>On your local computer</strong> in the censored network you just have to start the local scotty proxy:
+						You need a free <a href="http://appengine.google.com">Google AppEngine Account</a>. 
+						<ol>
+							<li>
+								Download the <a href="https://developers.google.com/appengine/downloads#Google_App_Engine_SDK_for_Java">Google AppEngine SDK for Java</a> and install it.
+							</li>
+							<li>
+								Login into your <a href="http://appengine.google.com">Google AppEngine Account</a> and create a new application by clicking the "Create Application" button.
+							</li>
+							<li>
+								Set an application identifier, set an application title and select "Open to all Google Accounts users (default)" and create application.
+							</li>
+							<li>
+								Download and unzip the scotty-gateway-gae-0.9.2.zip.
+							</li>
+							<li>
+								Insert in the WEB-INF/appengine-web.xml file the application identifier of your new Google AppEngine application:
+								<code>
+									&lt;?xml version="1.0" encoding="utf-8"?&gt;<br />
+									&lt;appengine-web-app xmlns="http://appengine.google.com/ns/1.0"&gt;<br />
+									  &lt;application&gt;<span style="text-weight:bold;color:#ff0000">your-application-identifier</span>&lt;/application&gt;<br />
+									  &lt;version&gt;2&lt;/version&gt;<br />
+									  &lt;threadsafe&gt;true&lt;/threadsafe&gt;<br />
+									&lt;/appengine-web-app&gt;<br />
+								</code>
+							</li>
+							<li>
+								Now upload the scotty gateway by using the Google AppEngine SDK:
+								<code>
+									&lt;appengine-sdk&gt;\bin&gt;appcfg update scotty-gateway-gae-0.9.2
+								</code>
+								(the third parameter scotty-gateway-gae-0.9.2 is the folder where you have unzipped the scotty-gateway-gae-0.9.2.zip).<br />
+								In the following dialog you have to enter the email and password of your Google account.<br />
+								<strong>Note</strong>: If you are using Google's two-factor authentication, you have to generate an application specific password for the appcfg script.
+							</li>
+							<li>
+								The URL of the gateway is http://your-application-identifier.appspot.com
+							</li>
+						</ol>
+					</p>
+					
+					
+					<h2>Startup of scotty on your local computer</h2>
+					
+					<p>
+                        On your local computer inside the censored network you just have to start the local scotty proxy:
                         <code>
-                            java -jar scotty-transporter-0.9.1.jar -p 8008 -g http://www.your-gateway-url.com:8008 -proxyHost proxy.yourcompany.de -proxyPort 8080</code>
+                            java -jar scotty-transporter-0.9.2.jar -p 8008 -g http://www.your-gateway-url.com:8008 -proxyHost proxy.yourcompany.de -proxyPort 8080</code>
 
 						Example for PHP based usage (just another URL pointing to your PHP script):
 						<code>
-                            java -jar scotty-transporter-0.9.1.jar -p 8008 -g http://www.your-gateway-url.com/gateway.php -proxyHost proxy.yourcompany.de -proxyPort 8080</code>
+                            java -jar scotty-transporter-0.9.2.jar -p 8008 -g http://www.your-gateway-url.com/gateway.php -proxyHost proxy.yourcompany.de -proxyPort 8080</code>
 							
-                        After this two steps scotty is ready. You just have to set the proxy settings in your browser to localhost and the configured port (in this example 8008).
+                        After this two steps scotty is ready. Just set the proxy settings in your browser to localhost and the configured port (in this example 8008).
                     </p>
                     <div style="width:732px; z-index:2; float:left; margin-left:-250px; margin-top:20px;">
                         <div style="text-align: center; float:none; padding-left:50px; width: 100%;"><img src="images/content/seperator_code.png">
@@ -170,7 +231,7 @@
                         <h2>Configuration</h2>
 
                         <p>
-                            <u>Following configuration parameters are available for <strong>scotty proxy</strong> scotty-transporter-0.9.1.jar</u>
+                            <u>Following configuration parameters are available for <strong>scotty proxy</strong> scotty-transporter-0.9.2.jar</u>
                         </p>
                         <br>
                         <table>
@@ -215,7 +276,7 @@
                         <br>
                         <br>
                         <p>
-                            <u>Following configuration parameters are available for <strong>scotty gateway</strong> scotty-gateway-standalone-0.9.1.jar</u>
+                            <u>Following configuration parameters are available for <strong>scotty gateway</strong> scotty-gateway-standalone-0.9.2.jar</u>
                         </p>
                         <br>
                         <table>
@@ -255,7 +316,7 @@
                             <li>
                                 Generate KeyPair for your local proxy by using the command line parameter c:
                                 <code>
-                                    #&gt;java -jar scotty-transporter-0.9.1.jar -c
+                                    #&gt;java -jar scotty-transporter-0.9.2.jar -c
                                     <br />
                                     filename of private key: proxyprivatekey
                                     <br />
@@ -281,8 +342,9 @@
                             <li>
                                 <strong>Java based gateway:</strong> Now start the gateway with the generated keys:
                                 <code>
-                                    java -jar scotty-gateway-standalone-0.9.1.jar -privatekey c:/tmp/gatewayprivatekey -publickey c:/tmp/gatewaypublickey -clientspublickeys c:/tmp/proxypublickey -privatekeypassword yourpass
+                                    java -jar scotty-gateway-standalone-0.9.2.jar -privatekey c:/tmp/gatewayprivatekey -publickey c:/tmp/gatewaypublickey -clientspublickeys c:/tmp/proxypublickey -privatekeypassword yourpass
                                 </code>
+								
 								
 								<strong>PHP based gateway:</strong> You have to insert your new generated keys in the gateway.php. Thats really easy. Open your generated key files and copy/paste them into the gateway.php:
 								
@@ -300,46 +362,25 @@
 								);<br />
 								...
 								</code>
+								
+								
+								<strong>Google AppEngine gateway:</strong> Unzip the scotty-gateway-gae-0.9.2.zip file and replace the content of the 
+								default keys in the WEB-INF/classes folder (clients, gw-defaultprivatekey, gw-defaultpublickey) with the content of your 
+								own generated key files.
+								
+								<p style="margin-top:10px">
+								On PHP and Google AppEngine based gateways you can not use a password for the private key. On key generation you have to hit enter without any input 
+								when scotty asks you for the private key password. This is not a security issue because the gateway server has to know the private key password in every
+								case to handle your requests.
+								</p>
                             </li>
                             <li>
                                 In the censored network we start our local scotty transporter proxy with following options:
                                 <code>
-                                    java -jar scotty-transporter-0.9.1.jar -g http://localhost:9000 -privatekey c:/tmp/proxyprivatekey -publickey c:/tmp/proxypublickey -gatewayspublickey c:/tmp/gatewaypublickey -privatekeypassword yourpass
+                                    java -jar scotty-transporter-0.9.2.jar -g http://localhost:9000 -privatekey c:/tmp/proxyprivatekey -publickey c:/tmp/proxypublickey -gatewayspublickey c:/tmp/gatewaypublickey -privatekeypassword yourpass
                                 </code>
                             </li>
                         </ol>
-
-                        <h2>Google AppEngine Tutorial</h2>
-
-                        Requirements:
-                        <ul>
-                            <li>
-                                Google Appengine Account
-                            </li>
-                            <li>
-                                Google Appengine Java SDK
-                            </li>
-                            <li>
-                                exploded scotty-gateway-gae folder
-                            </li>
-                        </ul>
-                        <ol>
-                            <li>
-                                Create an application on the Google appengine.
-                            </li>
-                            <li>
-                                Edit the scotty-gateway-gae\src\main\webapp\WEB-INF\appengine-web.xml and insert your own application name and version on the cloud.
-                            </li>
-                            <li>
-                                Execute the following command on the commandline.
-                            </li>
-                        </ol>
-                        <code>
-                            &lt;appengine-sdk&gt;\bin>appcfg update scotty-gateway-gae
-                        </code>
-                        and follow the dialog, where you have to enter your e-mail and password.
-                        <br />
-                        <b>Note:</b> If you are using Google's two-factor authentication, you have to generate an application specific password for the appcfg script.
 
                     </div>
 
@@ -354,13 +395,16 @@
                     <h1>Download</h1>
                     <ul>
                         <li>
-                            <a href="https://github.com/downloads/SSilence/scotty/scotty-gateway-standalone-0.9.1.jar">scotty-gateway-standalone-0.9.1.jar (3.6 MB)</a><span style="font-size:0.8em;color:#999"> the scotty gateway script</span>
+                            <a href="https://github.com/downloads/SSilence/scotty/scotty-gateway-standalone-0.9.2.jar">scotty-gateway-standalone-0.9.2.jar (3.6 MB)</a><span style="font-size:0.8em;color:#999"> the scotty gateway script</span>
                         </li>
                         <li>
-                            <a href="https://github.com/downloads/SSilence/scotty/scotty-transporter-0.9.1.jar">scotty-transporter-0.9.1.jar (2.8 MB)</a><span style="font-size:0.8em;color:#999"> the local scotty proxy script</span>
+                            <a href="https://github.com/downloads/SSilence/scotty/scotty-transporter-0.9.2.jar">scotty-transporter-0.9.2.jar (2.8 MB)</a><span style="font-size:0.8em;color:#999"> the local scotty proxy script</span>
                         </li>
 						<li>
-                            <a href="https://github.com/downloads/SSilence/scotty/scotty-gateway-gae-0.9.1.zip">scotty-gateway-gae-0.9.1.zip (7.8 MB)</a><span style="font-size:0.8em;color:#999"> gateway script for Google AppEngine</span>
+                            <a href="https://github.com/downloads/SSilence/scotty/scotty-gateway-gae-0.9.2.zip">scotty-gateway-gae-0.9.2.zip (7.8 MB)</a><span style="font-size:0.8em;color:#999"> gateway script for Google AppEngine</span>
+                        </li>
+						<li>
+                            <a href="https://github.com/downloads/SSilence/scotty/scotty-gateway-php-0.9.2.zip">scotty-gateway-php-0.9.2.zip (7.8 MB)</a><span style="font-size:0.8em;color:#999"> PHP based gateway script</span>
                         </li>
                     </ul>
 
