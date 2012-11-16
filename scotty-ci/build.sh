@@ -28,22 +28,22 @@ PROFILES[1]="-P gae"
 
 echo ====\> `date`
 
-# make dirs, if not existing
-mkdir -p $RELEASES_FOLDER
-mkdir -p $RELEASES_FOLDER_ARCHIVE
-
-# Mave old Release to archive
-stat $RELEASES_FOLDER* &> /dev/null
-if [ "$?" == "0" ]; then
-	mv -f $RELEASES_FOLDER* $RELEASES_FOLDER_ARCHIVE/
-fi
-
 # pull git repo
 cd $PROJECT
 GIT_OUTPUT=`git pull`
 if [ "$GIT_OUTPUT" == "Already up-to-date."  ]; then
 	echo $GIT_OUTPUT
 else
+	# make dirs, if not existing
+	mkdir -p $RELEASES_FOLDER
+	mkdir -p $RELEASES_FOLDER_ARCHIVE
+
+	# Mave old Release to archive
+	stat $RELEASES_FOLDER* &> /dev/null
+	if [ "$?" == "0" ]; then
+        	mv -f $RELEASES_FOLDER* $RELEASES_FOLDER_ARCHIVE/
+	fi
+
 	#run each profile and copy to RELEASES_FOLDER
 	for p in "${PROFILES[@]}" 
 	do
