@@ -3,6 +3,7 @@
 /**
  * PHP based Gateway for scotty.
  * 
+ * @version 0.9.2
  * @author zeising.tobias <br>
  *         copyright (C) 2012, http://www.scotty-transporter.org, http://www.aditu.de, tobias.zeising@aditu.de
  */
@@ -16,10 +17,10 @@ $proxyPass = '';
 $transporter = 'tcp://';
 
 // insert your public key between the ""
-$defaultPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApFfAGjnj2JXTE0ak1piBXkOlZ1n85zozFKdCjoOqfF6JTyV334x/g4w2sR9+U22d+grAhuJRoyWmd6JQxoyknSg7ZdzonZJXhTQThCBo2m/k0SdAbtT4HD0smjeWgZdzJljTzhhHSTKDIks50+KF1Geop9swZjTcp4KgMSbgBmoNYV3uMxjP6siTn+4+Bdl/ubTXIQrR/4+2QFhfYiMYDW3ZiO90tbcn2FOATc6tXGkceTkWfOkGnRIP2SsnKMQf2wq2DwzNlmGLmimKqzxSjetoaOBvtR4HF/BoL0GQMGyJC+SvTZlZ7xEuh9BNA2yDB4lVfaun6VgC49tNbMpY8wIDAQAB";
+$publicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApFfAGjnj2JXTE0ak1piBXkOlZ1n85zozFKdCjoOqfF6JTyV334x/g4w2sR9+U22d+grAhuJRoyWmd6JQxoyknSg7ZdzonZJXhTQThCBo2m/k0SdAbtT4HD0smjeWgZdzJljTzhhHSTKDIks50+KF1Geop9swZjTcp4KgMSbgBmoNYV3uMxjP6siTn+4+Bdl/ubTXIQrR/4+2QFhfYiMYDW3ZiO90tbcn2FOATc6tXGkceTkWfOkGnRIP2SsnKMQf2wq2DwzNlmGLmimKqzxSjetoaOBvtR4HF/BoL0GQMGyJC+SvTZlZ7xEuh9BNA2yDB4lVfaun6VgC49tNbMpY8wIDAQAB";
 
 // insert your private key between the ""
-$defaultPrivateKey = "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCkV8AaOePYldMTRqTWmIFeQ6VnWfznOjMUp0KOg6p8XolPJXffjH+DjDaxH35TbZ36CsCG4lGjJaZ3olDGjKSdKDtl3OidkleFNBOEIGjab+TRJ0Bu1PgcPSyaN5aBl3MmWNPOGEdJMoMiSznT4oXUZ6in2zBmNNyngqAxJuAGag1hXe4zGM/qyJOf7j4F2X+5tNchCtH/j7ZAWF9iIxgNbdmI73S1tyfYU4BNzq1caRx5ORZ86QadEg/ZKycoxB/bCrYPDM2WYYuaKYqrPFKN62ho4G+1HgcX8GgvQZAwbIkL5K9NmVnvES6H0E0DbIMHiVV9q6fpWALj201syljzAgMBAAECggEAdFv1Fhya6ETcmC9SkuaT4mw+9nhOimE4vYzXoRQ0Z65/xdwfjdZqineCWdKUnPll+x4VxusDJmKIBPiV/J6kBunvdGX/BWISOavvjYNs+gxzlGsYQeDkcwoVRHPLSqIy05ndDXU/M+Jh2qwsm4steoCSd5bII/WVrbzdMy/1OlRF/jbW6Q7uFHxJiz5cJuCG9/W+a6gAYMn8EEdu0G5ZwLFcM2PbOx3RsIQkn9/CsvfQijmkpYDsh72gOzB+Vw1G4/JmriIGXhqUWzKUjr9yVtLtLYb593980/0TjRiXo+W3HmAVUoeiH7oB5rP9SjfRs+nbiHBEam2/Ez+Gt6wNMQKBgQDPr8EIoNGmS7assbKqCUaJT9pB0ON6yC67kFq0UmxgJ+g8SQu+3aetSxip8Gg2pG1Ekbids2KwOuF0xE6WbDz+pQ3Wstw9dU0np9BLlrQ5WEbrxZeYQH4JiXOar8GaE1h7wC0Clw+m5jzhvE3dxQ2lHYsRw51dv74OjEuoTXQbNwKBgQDKksSrDC688IsC3DnLPPQpdxRmO/susfFMorVu/jUW/jAVsVGbCXnaZvnRlkdHSl59eCgbT9JwVPWQHsbzzWD/G+sX35QqCrgy4TJUsEEqdxmt1gHL46nGnDE46cSAJXTp9A6Dkysq2zbH0fnd3pQHdWNk8ACPBZuI+cTLx2nmJQKBgQCBud5xbUKHBTQNmtFmtHSCwIYsJjZxMyk9r2V4zSM0zLibL2VOy1U5QXcebzQpLXuzIPKYTryOJ7k8HoKYIvPWe3KxcPdwzBxtcL0C+heI2kMycjHGwEH54wl6zd24R+01H0z+GS2FqrrMpbpdlAB56oI7jlx1epdUrv1zGy4y8QKBgCzmRw0akCl0r3sc0PqJMh0WtcDLPqtk6XTxA4Hselv0Tzgfq1TPzuBnvquDwZy9kSACR/F1ydD4I82j5LkZJoyk5YDPH4oKAjXU0FERGACPkXOEYbWNao4JBKf2uIUmyDkqzSTAs+q11/iGQ/m3YdwdWsB+qcEJnyXHJqV8N665AoGAZwvqOnN5a1jaLGaaK2GGSUh38/khwHv0NWCYCLDa83YP9s29BCMi78FFliCSVbPqH7pOCBS+fhvLB3Z8pcJQ8nyaB1SzlAKtabAr9IFuDF6tNVm5gPuu2AqehTOsJXh2xME/BGUHZ3uLnibL1ChUUCgehkQ47XwKRGWd5XRGhOk=";
+$privateKey = "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCkV8AaOePYldMTRqTWmIFeQ6VnWfznOjMUp0KOg6p8XolPJXffjH+DjDaxH35TbZ36CsCG4lGjJaZ3olDGjKSdKDtl3OidkleFNBOEIGjab+TRJ0Bu1PgcPSyaN5aBl3MmWNPOGEdJMoMiSznT4oXUZ6in2zBmNNyngqAxJuAGag1hXe4zGM/qyJOf7j4F2X+5tNchCtH/j7ZAWF9iIxgNbdmI73S1tyfYU4BNzq1caRx5ORZ86QadEg/ZKycoxB/bCrYPDM2WYYuaKYqrPFKN62ho4G+1HgcX8GgvQZAwbIkL5K9NmVnvES6H0E0DbIMHiVV9q6fpWALj201syljzAgMBAAECggEAdFv1Fhya6ETcmC9SkuaT4mw+9nhOimE4vYzXoRQ0Z65/xdwfjdZqineCWdKUnPll+x4VxusDJmKIBPiV/J6kBunvdGX/BWISOavvjYNs+gxzlGsYQeDkcwoVRHPLSqIy05ndDXU/M+Jh2qwsm4steoCSd5bII/WVrbzdMy/1OlRF/jbW6Q7uFHxJiz5cJuCG9/W+a6gAYMn8EEdu0G5ZwLFcM2PbOx3RsIQkn9/CsvfQijmkpYDsh72gOzB+Vw1G4/JmriIGXhqUWzKUjr9yVtLtLYb593980/0TjRiXo+W3HmAVUoeiH7oB5rP9SjfRs+nbiHBEam2/Ez+Gt6wNMQKBgQDPr8EIoNGmS7assbKqCUaJT9pB0ON6yC67kFq0UmxgJ+g8SQu+3aetSxip8Gg2pG1Ekbids2KwOuF0xE6WbDz+pQ3Wstw9dU0np9BLlrQ5WEbrxZeYQH4JiXOar8GaE1h7wC0Clw+m5jzhvE3dxQ2lHYsRw51dv74OjEuoTXQbNwKBgQDKksSrDC688IsC3DnLPPQpdxRmO/susfFMorVu/jUW/jAVsVGbCXnaZvnRlkdHSl59eCgbT9JwVPWQHsbzzWD/G+sX35QqCrgy4TJUsEEqdxmt1gHL46nGnDE46cSAJXTp9A6Dkysq2zbH0fnd3pQHdWNk8ACPBZuI+cTLx2nmJQKBgQCBud5xbUKHBTQNmtFmtHSCwIYsJjZxMyk9r2V4zSM0zLibL2VOy1U5QXcebzQpLXuzIPKYTryOJ7k8HoKYIvPWe3KxcPdwzBxtcL0C+heI2kMycjHGwEH54wl6zd24R+01H0z+GS2FqrrMpbpdlAB56oI7jlx1epdUrv1zGy4y8QKBgCzmRw0akCl0r3sc0PqJMh0WtcDLPqtk6XTxA4Hselv0Tzgfq1TPzuBnvquDwZy9kSACR/F1ydD4I82j5LkZJoyk5YDPH4oKAjXU0FERGACPkXOEYbWNao4JBKf2uIUmyDkqzSTAs+q11/iGQ/m3YdwdWsB+qcEJnyXHJqV8N665AoGAZwvqOnN5a1jaLGaaK2GGSUh38/khwHv0NWCYCLDa83YP9s29BCMi78FFliCSVbPqH7pOCBS+fhvLB3Z8pcJQ8nyaB1SzlAKtabAr9IFuDF6tNVm5gPuu2AqehTOsJXh2xME/BGUHZ3uLnibL1ChUUCgehkQ47XwKRGWd5XRGhOk=";
 
 // public keys of clients which are allowed to connect to this gateway
 $clientPublicKeys = array(
@@ -37,6 +38,7 @@ $maxTimestampValidity = 5400; // 1.5 hours
 
 // enable, disable loggin
 $loggingEnabled = false;
+
 
 // to all non php nerds: don't change anything behind this line
 ///////////////////////////////////////////////////////////////
@@ -70,10 +72,10 @@ if (!class_exists('Math_BigInteger')) { require_once('Math/BigInteger.php'); } i
 $useEncryption = true;
 
 // public key
-$publicKey = base64_decode($defaultPublicKey);
+$binaryPublicKey = base64_decode(trim($publicKey));
 
 // private key
-$privateKey = base64_decode($defaultPrivateKey);
+$binaryPrivateKey = base64_decode(trim($privateKey));
 
 // decode clients public keys
 for($i=0;$i<count($clientPublicKeys);$i++)
@@ -168,9 +170,11 @@ if($useEncryption===true) {
     // read aes password from cache
     //
     $aesPassword = "";
-    if(isset($keyCache[$token]))
+    if(isset($keyCache[$token])) {
         $aesPassword = $keyCache[$token]['aes'];
-    
+		logger("use cached AES password");
+    }
+	
     //
     // no aes password in cache? verify token
     //
@@ -178,9 +182,15 @@ if($useEncryption===true) {
         // decript token with rsa
         $rsa = new Crypt_RSA();
         $rsa->setEncryptionMode(CRYPT_RSA_ENCRYPTION_PKCS1);
-        $rsa->loadKey($privateKey);
+        if($rsa->loadKey($binaryPrivateKey)===false)
+			error("can't load private key");
+		logger("private key loaded");
+		
         $decryptedToken = $rsa->decrypt(base64_decode($token));
-        
+        if($decryptedToken===false)
+			error("can't decrypt signed security token");
+		logger("signed security token decrypted");
+		
         // read password and timestamp
         $decryptedTokenParts = preg_split("/\|/", $decryptedToken);
         if(count($decryptedTokenParts)<2)
@@ -191,12 +201,13 @@ if($useEncryption===true) {
         // check timestamp
         if($tokenTimestamp+$maxTimestampValidity<time())
             error("invalid token timestamp");
-        
+        logger("valid token timestamp");
+		
         // check sign
         $hashedAesPasswordAndTimestamp = hash("sha256", $aesPassword . "|" . $tokenTimestamp, true);
         $validSign = false;
-        foreach($clientPublicKeys as $publicKey) {
-            $rsa->loadKey($publicKey);
+        foreach($clientPublicKeys as $clientPublicKey) {
+            $rsa->loadKey($clientPublicKey);
             $decryptedSign = $rsa->decrypt(base64_decode($tokenSign));
             if($decryptedSign==$hashedAesPasswordAndTimestamp) {
                 $validSign = true;
@@ -205,7 +216,8 @@ if($useEncryption===true) {
         }
         if($validSign !== true)
             error("invalid token sign");
-        
+        logger("valid token sign");
+		
         // all ok: save token in cache
         $keyCache[$token] = array(
             "timestamp" => time(),
@@ -223,11 +235,14 @@ if($useEncryption===true) {
     $aes->enablePadding();
 
     // password is the first 16 byte of a SHA 256 hashed given aes password
+	if(strlen(trim($aesPassword))==0)
+		logger("warning: empty aes password");
     $aesPasswordHashed = substr(hash("sha256", $aesPassword, true), 0, 16);
-
+	
     $aes->setKey($aesPasswordHashed);
     $request = $aes->decrypt(base64_decode($data));
-
+	if(strlen(trim($request))==0)
+		logger("warning: empty request, possible aes decryption error");
 } else {
     $request = $encryptedRequest;
 }
@@ -326,6 +341,7 @@ logger("open connection: ". $host . ":" . $port);
 $connection = fsockopen($host, $port, $errno, $errstr, $timeout);
 if(!$connection)
     error("Connection Error: " . $host . ":" . $port);
+logger("successfully connected");
 
 $request = $header."\r\n".$body."\r\n\r\n";
 fputs($connection, $request);
@@ -346,6 +362,8 @@ if($useEncryption===true) {
     $aes->enablePadding();
     $aes->setKey($aesPasswordHashed);
     $response = base64_encode($aes->encrypt($response));
+	if(strlen(trim($response))==0)
+		logger("warning: empty response possible aes encryption error");
 }
 
 logger("response encrypted: ".strlen($response) . " Byte");
