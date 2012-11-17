@@ -71,6 +71,7 @@ elif [ $RET -eq 2 ] || [ "$FORCE" == "force" ];then
 		fi
 		if [ $? -ne 0 ];then 
 			echo BUILD FAILED
+			rm $LOCKFILE
 			exit $?
 		fi
 		for i in `find ./ -maxdepth 4 -regex $PATTERN`;do echo cp -f $i $RELEASES_FOLDER &>> $LOGFILE; cp -f $i $RELEASES_FOLDER;done
