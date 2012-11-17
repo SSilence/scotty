@@ -8,11 +8,13 @@
 #  \ \ \ \ \ Continous Integration Bash Script
 # 
 # This script pulls, compiles, and puts the files on the configured ftp server.
+# Usage:
+# sh build.sh [force] [nomaven]
 
-PROJECT=/home/ci/ci/projects/scotty
-RELEASES_FOLDER=/home/ci/ci/release/
+export PROJECT=/home/ci/ci/projects/scotty
+export RELEASES_FOLDER=/home/ci/ci/release/
 RELEASES_FOLDER_ARCHIVE=/home/ci/ci/release-archive/`date +%s`
-FILE_PATTERN=".*\.\(war\|jar\)"
+FILE_PATTERN=".*\.\(war\|jar\|zip\|php\)"
 PATTERN=".*/target/scotty$FILE_PATTERN"
 MVN_SETTINGS=/home/ci/ci/settings.xml
 
@@ -21,25 +23,33 @@ PASSWORD=$PASSWORD
 HOSTNAME=$HOSTNAME
 REMOTE_DIR=$REMOTE_DIR
 LOGFILE=$SCOTTY_LOGFILE
-
+AFTER_BUILD_SCRIPT=/home/ci/ci/afterBuild.sh
 # Profles to run:
 PROFILES[0]=
 PROFILES[1]="-P gae"
 LOCKFILE=.scotty_ci_lockfile
 
+FORCE=$1
+NOMAVEN=$2
+
 echo ====\> `date`
 stat $LOCKFILE &>/dev/null
-LOCK=`echo $?`
+LOCK=$?
 
 # pull git repo
 cd $PROJECT
-GIT_OUTPUT=`git pull`
-if [ "$LOCK" == "0" ] || [ "$GIT_OUTPUT" == "Already up-to-date."  ]; then
-	echo $GIT_OUTPUT
-	if [ "$LOCK" == "0" ]; then
+sh /home/ci/ci/isUpdateNeeded.sh
+RET=$?
+if [ $RET -eq 3 ];then
+	echo Something is wrong, git pull unsuccessful
+	exit $RET
+fi
+
+if ([ $LOCK -eq 0 ] || [ $RET -eq 0 ]) && [ "$FORCE" != "force" ]; then
+	if [ $LOCK -eq 0 ]; then
 		echo Lockile $LOCKFILE exists..build is currently running
 	fi
-else
+elif [ $RET -eq 2 ] || [ "$FORCE" == "force" ];then 
 	touch $LOCKFILE
 	# make dirs, if not existing
 	mkdir -p $RELEASES_FOLDER
@@ -47,22 +57,34 @@ else
 
 	# Mave old Release to archive
 	stat $RELEASES_FOLDER* &> /dev/null
-	if [ "$?" == "0" ]; then
+	if [ $? -eq 0 ]; then
         	mv -f $RELEASES_FOLDER* $RELEASES_FOLDER_ARCHIVE/
 	fi
 
 	#run each profile and copy to RELEASES_FOLDER
 	for p in "${PROFILES[@]}" 
 	do
-		echo ------------------------------ Profile $p ----------------------------------
-		mvn -l $SCOTTY_LOGFILE -s $MVN_SETTINGS $p -U clean install
-		for i in `find ./ -maxdepth 4 -regex $PATTERN`;do echo cp -f $i $RELEASES_FOLDER; cp -f $i $RELEASES_FOLDER;done
+		echo ------------------------------ Profile $p ---------------------------------- &>> $LOGFILE
+		if [ "$NOMAVEN" == "nomaven" ];then
+			echo Maven DISABLED!
+		else
+			mvn -l $SCOTTY_LOGFILE -s $MVN_SETTINGS $p -U clean install
+		fi
+		if [ $? -ne 0 ];then 
+			echo BUILD FAILED
+			exit $?
+		fi
+		for i in `find ./ -maxdepth 4 -regex $PATTERN`;do echo cp -f $i $RELEASES_FOLDER &>> $LOGFILE; cp -f $i $RELEASES_FOLDER;done
 	done
+	echo Running afterbuild Script:
+	if [ -f "$AFTER_BUILD_SCRIPT" ];then
+		sh $AFTER_BUILD_SCRIPT &>> $LOGFILE
+	fi
 
-	echo Uploading to FTP:
+	echo Uploading to FTP: &>> $LOGFILE
 	for i in `find $RELEASES_FOLDER -regex $FILE_PATTERN`
 	do
-		ncftpput -T PART -u $REMOTE_USER -p $PASSWORD $HOSTNAME $REMOTE_DIR $i
+		ncftpput -T PART -u $REMOTE_USER -p $PASSWORD $HOSTNAME $REMOTE_DIR $i &>> $LOGFILE
 	done
 	rm $LOCKFILE
 fi

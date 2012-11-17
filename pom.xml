@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>scotty</groupId>
 	<artifactId>scotty-parent</artifactId>
-	<version>0.9.1-SNAPSHOT</version>
+	<version>0.9.3-SNAPSHOT</version>
 	<name>scotty parent</name>
 	<packaging>pom</packaging>
 	
