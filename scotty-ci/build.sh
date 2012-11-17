@@ -9,7 +9,7 @@
 # 
 # This script pulls, compiles, and puts the files on the configured ftp server.
 # Usage:
-# sh build.sh [force] [nomaven]
+# sh build.sh [force]
 
 export PROJECT=/home/ci/ci/projects/scotty
 export RELEASES_FOLDER=/home/ci/ci/release/
@@ -27,14 +27,12 @@ AFTER_BUILD_SCRIPT=/home/ci/ci/afterBuild.sh
 # Profles to run:
 PROFILES[0]=
 PROFILES[1]="-P gae"
-LOCKFILE=.scotty_ci_lockfile
+LOCKFILE=$PROJECT/.scotty_ci_lockfile
 
 FORCE=$1
 NOMAVEN=$2
 
 echo ====\> `date`
-stat $LOCKFILE &>/dev/null
-LOCK=$?
 
 # pull git repo
 cd $PROJECT
@@ -42,11 +40,12 @@ sh /home/ci/ci/isUpdateNeeded.sh
 RET=$?
 if [ $RET -eq 3 ];then
 	echo Something is wrong, git pull unsuccessful
+
 	exit $RET
 fi
 
-if ([ $LOCK -eq 0 ] || [ $RET -eq 0 ]) && [ "$FORCE" != "force" ]; then
-	if [ $LOCK -eq 0 ]; then
+if ([ -e "$LOCKFILE" ] || [ $RET -eq 0 ]) && [ "$FORCE" != "force" ]; then
+	if [ -e "$LOCKFILE" ]; then
 		echo Lockile $LOCKFILE exists..build is currently running
 	fi
 elif [ $RET -eq 2 ] || [ "$FORCE" == "force" ];then 
