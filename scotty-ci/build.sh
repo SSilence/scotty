@@ -56,7 +56,7 @@ else
 	do
 		echo ------------------------------ Profile $p ----------------------------------
 		mvn -l $SCOTTY_LOGFILE -s $MVN_SETTINGS $p -U clean install
-		for i in `find ./ -maxdepth 4 -regex $PATTERN`;do echo cp -f $i $RELEASES_FOLDER; cp $i $RELEASES_FOLDER;done
+		for i in `find ./ -maxdepth 4 -regex $PATTERN`;do echo cp -f $i $RELEASES_FOLDER; cp -f $i $RELEASES_FOLDER;done
 	done
 
 	echo Uploading to FTP:
