@@ -16,13 +16,13 @@ import scotty.util.Messages;
 
 /**
  * Manages the systray.
- * 
+ *
  * @author flo
- * 
+ *
  */
 public class SystrayManager {
 
-	private SystemTray tray;
+	// private SystemTray tray;
 	private TrayIcon icon;
 	private Messages msgs = new Messages();
 
@@ -33,8 +33,8 @@ public class SystrayManager {
 	private PopupMenu menu = new PopupMenu();
 
 	public SystrayManager() {
-		if (SystemTray.isSupported()) {
-			tray = SystemTray.getSystemTray();
+		if (isSupported()) {
+			SystemTray tray = SystemTray.getSystemTray();
 
 			icon = new TrayIcon(createImage(defaultImage), "scotty", menu);
 
@@ -55,10 +55,16 @@ public class SystrayManager {
 				e1.printStackTrace();
 			}
 		}
-
 	}
 
 	public void setRunning(boolean runs) {
+		updateTrayIconIfSupported(runs);
+	}
+
+	private void updateTrayIconIfSupported(boolean runs) {
+		if (!isSupported()) {
+			return;
+		}
 		if (runs) {
 			icon.setImage(createImage(runningImage));
 		} else {
@@ -66,16 +72,14 @@ public class SystrayManager {
 		}
 	}
 
+	public boolean isSupported() {
+		return SystemTray.isSupported();
+	}
+
 	public void setTooltip(String tooltip) {
-		icon.setToolTip(tooltip);
-	}
-
-	public SystemTray getTray() {
-		return tray;
-	}
-
-	public void setTray(SystemTray tray) {
-		this.tray = tray;
+		if (isSupported()) {
+			icon.setToolTip(tooltip);
+		}
 	}
 
 	public TrayIcon getIcon() {
@@ -86,7 +90,7 @@ public class SystrayManager {
 		this.icon = icon;
 	}
 
-	public static Image createImage(String path) {
+	private static Image createImage(String path) {
 		java.net.URL imgURL = SystrayManager.class.getResource(path);
 		if (imgURL != null) {
 			Image img = Toolkit.getDefaultToolkit().createImage(imgURL);
