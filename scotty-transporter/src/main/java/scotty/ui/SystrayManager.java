@@ -34,10 +34,11 @@ public class SystrayManager {
 
 	private String runningImage = "/systray-loader.gif";
 
-	private PopupMenu menu = new PopupMenu();
+
 
 	public SystrayManager() {
 		if (isSupported()) {
+			PopupMenu menu = new PopupMenu();
 			SystemTray tray = SystemTray.getSystemTray();
 
 			icon = new TrayIcon(createImage(defaultImage), "scotty", menu);
