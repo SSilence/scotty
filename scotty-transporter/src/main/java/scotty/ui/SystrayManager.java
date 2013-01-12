@@ -10,17 +10,21 @@ import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import org.apache.log4j.Logger;
+
 import scotty.event.EventDispatcher;
 import scotty.event.Events;
 import scotty.util.Messages;
 
 /**
  * Manages the systray.
- *
+ * 
  * @author flo
- *
+ * 
  */
 public class SystrayManager {
+
+	private Logger log = Logger.getLogger(SystrayManager.class);
 
 	// private SystemTray tray;
 	private TrayIcon icon;
@@ -73,7 +77,15 @@ public class SystrayManager {
 	}
 
 	public boolean isSupported() {
-		return SystemTray.isSupported();
+		boolean avail = false;
+		try {
+			avail = SystemTray.isSupported();
+		} catch (Exception e) {
+			avail = false;
+			log.warn("Systray is not available", e);
+		}
+
+		return avail;
 	}
 
 	public void setTooltip(String tooltip) {
