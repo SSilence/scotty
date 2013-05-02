@@ -4,6 +4,7 @@ import java.util.logging.Logger;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
@@ -53,6 +54,8 @@ public class StandaloneGatewayMain {
 	 * default private key
 	 */
 	private static final int DEFAULT_PORT = 9000;
+	
+	private static final String HELP_CMDLINE_PARAM = "h";
 
 	
 	public static void main(String[] args) throws Exception {
@@ -86,9 +89,18 @@ public class StandaloneGatewayMain {
 		opts.addOption(CLIENTSPUBLICKEY_CMDLINE_PARAM, true, "public keys of clients");
 		opts.addOption(TOKENTIMEOUT_CMDLINE_PARAM, true, "timeout for the RSA token (default = 1.5 hours)");
 		opts.addOption(LOCALPORT_CMDLINE_PARAM, true, "Local port, where gateway listens for requests");
+		opts.addOption(HELP_CMDLINE_PARAM, false, "Print help message and exit.");
+		
 		
 		CommandLineParser cmd = new PosixParser();
 		CommandLine line = cmd.parse(opts, args);
+		
+		if ( line.hasOption(HELP_CMDLINE_PARAM)) {
+			HelpFormatter formatter = new HelpFormatter();
+			formatter.printHelp("scotty-gateway", opts, true);
+			System.exit(0);
+		}
+		
 		return line;
 	}
 	

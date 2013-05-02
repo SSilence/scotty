@@ -3,9 +3,12 @@ package scotty;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
@@ -35,6 +38,8 @@ import scotty.event.Events;
  * 
  */
 public class ScottyCli implements EventObserver {
+
+	private static final String HELP_CMDLINE_PARAM = "h";
 
 	private static Logger log = Logger.getLogger(ScottyCli.class);
 
@@ -247,27 +252,35 @@ public class ScottyCli implements EventObserver {
 	 */
 	private CommandLine handleCommandline(String[] args) throws Exception {
 		Options opts = new Options();
-		opts.addOption(GATEWAY_CMDLINE_PARAM, true, "URL of the Gateway");
+		opts.addOption(GATEWAY_CMDLINE_PARAM, true, "URL of the gateway. e.g. http://yourpxory.somewhere");
 		opts.addOption(LOCALPORT_CMDLINE_PARAM, true,
 				"Local port, where scotty listens for requests");
 		opts.addOption(CREATEKEY_CMDLINE_PARAM, false, "Create new KeyPair");
-		opts.addOption(PRIVATEKEY_CMDLINE_PARAM, true, "private key");
+		opts.addOption(PRIVATEKEY_CMDLINE_PARAM, true, "Private key");
 		opts.addOption(OptionBuilder.hasOptionalArg().withDescription("private key password (if one was set)").create(PRIVATEKEYPASS_CMDLINE_PARAM));
-		opts.addOption(PUBLICKEY_CMDLINE_PARAM, true, "public key");
-		opts.addOption(GATEWAYSPUBLICKEY_CMDLINE_PARAM, true, "gateways public key");
+		opts.addOption(PUBLICKEY_CMDLINE_PARAM, true, "Public key");
+		opts.addOption(GATEWAYSPUBLICKEY_CMDLINE_PARAM, true, "Gateways public key");
 		
 		opts.addOption(DISABLE_ENCRYPTION_CMDLINE_PARAM, false,
-				"disable encryption");
+				"Disable encryption");
 		opts.addOption(TOKENTIMEOUT_CMDLINE_PARAM, true,
-				"timeout for the RSA token (default = 1.5 hours)");
+				"Timeout for the RSA token (default = 1.5 hours)");
 
 		opts.addOption(DONT_USE_GATEWAY, false,
 				"Don't use gateway - direct connection.");
-		opts.addOption(PROXY_HOST_CMDLINE_PARAM, true, "Proxy Host");
-		opts.addOption(PROXY_PORT_CMDLINE_PARAM, true, "Proxy Port");
+		opts.addOption(PROXY_HOST_CMDLINE_PARAM, true, "Proxy host");
+		opts.addOption(PROXY_PORT_CMDLINE_PARAM, true, "Proxy port");
+		opts.addOption(HELP_CMDLINE_PARAM, false, "Print help message and exit");
 
 		CommandLineParser cmd = new PosixParser();
 		CommandLine line = cmd.parse(opts, args);
+		
+		if ( line.hasOption(HELP_CMDLINE_PARAM) ) {
+			HelpFormatter formatter = new HelpFormatter();
+			formatter.printHelp("scotty", opts, true);
+			System.exit(0);
+		}
+		
 		if (line.hasOption(PROXY_HOST_CMDLINE_PARAM)
 				&& line.hasOption(PROXY_PORT_CMDLINE_PARAM)) {
 			scotty.setHttpProxy(line.getOptionValue(PROXY_HOST_CMDLINE_PARAM),
@@ -291,9 +304,39 @@ public class ScottyCli implements EventObserver {
 			scotty.setDisableEncryption(true);
 		}
 
+
+		validateParamsAndExitOnFailure();
+		
 		return line;
 	}
 
+
+	private void validateParamsAndExitOnFailure() {
+		String gatewayUrl = scotty.getGatewayUrl();
+		int exit = -1;
+		
+		if ( gatewayUrl != null && gatewayUrl.length() > 0 ) {
+			try {
+				URL url = new URL(gatewayUrl);
+			} catch (MalformedURLException e) {
+				System.err.println("Gateway URL not valid. Specified: [" + gatewayUrl +"]. Exit.");
+				
+				e.printStackTrace();
+				exit = 1;
+			}
+		}else {
+			System.err.println("Gateway URL not specified. Exit.");
+			exit = 2;
+		}
+		
+		if ( exit > -1 ) {
+			System.err.println("Use -h to see help.");
+			System.exit(exit);
+		}
+	}
+	
+	
+	
 	/**
 	 * Eventhandler for Systray Icon
 	 * 
