@@ -324,7 +324,7 @@ public class ScottyCli implements EventObserver {
 				e.printStackTrace();
 				exit = 1;
 			}
-		}else {
+		}else if (scotty.isUseGateway()) {
 			System.err.println("Gateway URL not specified. Exit.");
 			exit = 2;
 		}
