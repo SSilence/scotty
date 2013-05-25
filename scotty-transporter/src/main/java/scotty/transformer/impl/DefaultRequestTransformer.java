@@ -1,6 +1,7 @@
 package scotty.transformer.impl;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Logger;
 import org.owasp.webscarab.model.Request;
 
 import scotty.crypto.AESEncryption;
@@ -8,7 +9,15 @@ import scotty.crypto.CryptoException;
 import scotty.crypto.KeyManager;
 import scotty.transformer.RequestTransformer;
 
+/**
+ * Default request transformer, which is encrypting the request.
+ * 
+ * @author flo
+ *
+ */
 public class DefaultRequestTransformer implements RequestTransformer {
+	
+	private static Logger log = Logger.getLogger(DefaultRequestTransformer.class);
 
 	private KeyManager keyManager;
 
@@ -18,6 +27,9 @@ public class DefaultRequestTransformer implements RequestTransformer {
 
 	@Override
 	public byte[] transformRequest(Request request) {
+		if ( log.isTraceEnabled()) {
+			log.trace("Entering transformRequest: " + request.getURL() );
+		}
 		try {
 			// content as byte array
 			byte[] plainRequest = request.toString().getBytes();
@@ -44,8 +56,10 @@ public class DefaultRequestTransformer implements RequestTransformer {
 
 			return base64Request;
 		} catch (CryptoException e) {
-			// ToDo: errorhandling
-			e.printStackTrace();
+			log.error("Error transforming request: " + request.getURL(), e);
+			if ( log.isTraceEnabled()) {
+				log.trace("Error transforming request: " + request.getURL() + ", content: " + new String(request.getContent()));
+			}
 			return new byte[] {};
 		}
 	}

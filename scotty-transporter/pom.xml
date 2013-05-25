@@ -40,7 +40,7 @@
 		<dependency>
 			<groupId>scotty</groupId>
 			<artifactId>scotty-commons</artifactId>
-			<version>0.9.3-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<!-- Test -->

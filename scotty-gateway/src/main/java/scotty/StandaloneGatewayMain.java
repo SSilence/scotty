@@ -70,6 +70,8 @@ public class StandaloneGatewayMain {
 		if (commandLine.hasOption(LOCALPORT_CMDLINE_PARAM)) {
 			port = Integer.parseInt(commandLine.getOptionValue(LOCALPORT_CMDLINE_PARAM));
 			log.info("Use given port "+ commandLine.getOptionValue(LOCALPORT_CMDLINE_PARAM));
+		}else {
+			log.info("Using default port " + DEFAULT_PORT);
 		}
 		
 		// start server

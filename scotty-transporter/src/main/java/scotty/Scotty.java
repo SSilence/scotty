@@ -118,9 +118,9 @@ public class Scotty {
 		}
 
 		log.info("launching: "
-				+ (useGateway ? "Gateway: " + gatewayUrl : " no gateway")
-				+ ", Encryption: " + (disableEncryption ? "No" : "Yes")
-				+ ", Listening on: " + localAddr + ":" + localPort);
+				+ (useGateway ? "Using gateway: " + gatewayUrl : " Using no gateway")
+				+ ", encryption: " + (disableEncryption ? "No" : "Yes")
+				+ ", local proxy listening on: " + localAddr + ":" + localPort);
 	}
 
 	public ProxyPlugin createProxyPlugin(boolean useGateway,

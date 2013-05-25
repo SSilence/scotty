@@ -128,6 +128,11 @@ public class ScottyCli implements EventObserver {
 	 */
 	private String defaultLocalPort = "8008";
 
+	/**
+	 * Default Gateway URL of the scotty-gateway to use.
+	 */
+	private String defaultGatewayUrl = "http://localhost:9000";
+
 	public ScottyCli() {
 		EventDispatcher.add(this);
 	}
@@ -252,9 +257,9 @@ public class ScottyCli implements EventObserver {
 	 */
 	private CommandLine handleCommandline(String[] args) throws Exception {
 		Options opts = new Options();
-		opts.addOption(GATEWAY_CMDLINE_PARAM, true, "URL of the gateway. e.g. http://yourpxory.somewhere");
+		opts.addOption(GATEWAY_CMDLINE_PARAM, true, "URL of the gateway. e.g. http://yourpxory.somewhere. Default: http://localhost:" + defaultLocalPort);
 		opts.addOption(LOCALPORT_CMDLINE_PARAM, true,
-				"Local port, where scotty listens for requests");
+				"Local port, where scotty listens for requests. Default: " + defaultLocalPort);
 		opts.addOption(CREATEKEY_CMDLINE_PARAM, false, "Create new KeyPair");
 		opts.addOption(PRIVATEKEY_CMDLINE_PARAM, true, "Private key");
 		opts.addOption(OptionBuilder.hasOptionalArg().withDescription("private key password (if one was set)").create(PRIVATEKEYPASS_CMDLINE_PARAM));
@@ -262,9 +267,9 @@ public class ScottyCli implements EventObserver {
 		opts.addOption(GATEWAYSPUBLICKEY_CMDLINE_PARAM, true, "Gateways public key");
 		
 		opts.addOption(DISABLE_ENCRYPTION_CMDLINE_PARAM, false,
-				"Disable encryption");
+				"Disable encryption.");
 		opts.addOption(TOKENTIMEOUT_CMDLINE_PARAM, true,
-				"Timeout for the RSA token (default = 1.5 hours)");
+				"Timeout for the RSA token. Default: 1.5 hours");
 
 		opts.addOption(DONT_USE_GATEWAY, false,
 				"Don't use gateway - direct connection.");
@@ -291,7 +296,7 @@ public class ScottyCli implements EventObserver {
 							.getOptionValue(PROXY_PORT_CMDLINE_PARAM)));
 		}
 
-		scotty.setGatewayUrl(line.getOptionValue(GATEWAY_CMDLINE_PARAM, null));
+		scotty.setGatewayUrl(line.getOptionValue(GATEWAY_CMDLINE_PARAM, defaultGatewayUrl ));
 
 		scotty.setLocalPort(line.getOptionValue(LOCALPORT_CMDLINE_PARAM,
 				defaultLocalPort));
