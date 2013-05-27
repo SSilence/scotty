@@ -12,7 +12,9 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 import scotty.crypto.CryptoException;
 import scotty.crypto.KeyManager;
@@ -117,6 +119,11 @@ public class ScottyCli implements EventObserver {
 	 * default gateways key
 	 */
 	private static final String DEFAULT_GATEWAYSPUBLICKEY = "resources:gatewaydefaultpublickey";
+	
+	/**
+	 * Cmdline Param to enable debug logging.
+	 */
+	private static final String LOG_CMDLINE = "log";
 
 	/**
 	 * Instance of scotty.
@@ -276,6 +283,7 @@ public class ScottyCli implements EventObserver {
 		opts.addOption(PROXY_HOST_CMDLINE_PARAM, true, "Proxy host");
 		opts.addOption(PROXY_PORT_CMDLINE_PARAM, true, "Proxy port");
 		opts.addOption(HELP_CMDLINE_PARAM, false, "Print help message and exit");
+		opts.addOption(LOG_CMDLINE, false, "Enables debug logging");
 
 		CommandLineParser cmd = new PosixParser();
 		CommandLine line = cmd.parse(opts, args);
@@ -284,6 +292,11 @@ public class ScottyCli implements EventObserver {
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("scotty", opts, true);
 			System.exit(0);
+		}
+		
+		if ( line.hasOption(LOG_CMDLINE)) {
+			LogManager.resetConfiguration();
+			PropertyConfigurator.configure(ScottyCli.class.getResourceAsStream("/log4j-trace.properties"));
 		}
 		
 		if (line.hasOption(PROXY_HOST_CMDLINE_PARAM)
