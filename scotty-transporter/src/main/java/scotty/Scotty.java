@@ -1,5 +1,7 @@
 package scotty;
 
+import java.awt.GraphicsEnvironment;
+
 import org.apache.log4j.Logger;
 import org.owasp.webscarab.httpclient.HTTPClientFactory;
 import org.owasp.webscarab.model.Preferences;
@@ -84,11 +86,18 @@ public class Scotty {
 
 		framework = new Framework();
 
-		Preferences.setPreference("WebScarab.promptForCredentials", "true");
-		CredentialManager cm = framework.getCredentialManager();
-		CredentialManagerUI credentialRequestDialog = new CredentialRequestDialog(
-				null, true, cm);
-		cm.setUI(credentialRequestDialog);
+		if (GraphicsEnvironment.isHeadless()) {
+			log.warn("In headless mode, so the credentials of a intermediate proxy can't be fetched at runtime, currently");
+			Preferences
+					.setPreference("WebScarab.promptForCredentials", "false");
+
+		} else {
+			Preferences.setPreference("WebScarab.promptForCredentials", "true");
+			CredentialManager cm = framework.getCredentialManager();
+			CredentialManagerUI credentialRequestDialog = new CredentialRequestDialog(
+					null, true, cm);
+			cm.setUI(credentialRequestDialog);
+		}
 
 		loadMainPlugin(framework);
 
@@ -118,8 +127,9 @@ public class Scotty {
 		}
 
 		log.info("launching: "
-				+ (useGateway ? "Using gateway: " + gatewayUrl : " Using no gateway")
-				+ ", encryption: " + (disableEncryption ? "No" : "Yes")
+				+ (useGateway ? "Using gateway: " + gatewayUrl
+						: " Using no gateway") + ", encryption: "
+				+ (disableEncryption ? "No" : "Yes")
 				+ ", local proxy listening on: " + localAddr + ":" + localPort);
 	}
 

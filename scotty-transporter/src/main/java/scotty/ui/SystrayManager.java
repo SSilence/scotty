@@ -83,7 +83,7 @@ public class SystrayManager {
 			avail = SystemTray.isSupported();
 		} catch (Exception e) {
 			avail = false;
-			log.warn("Systray is not available", e);
+			log.info("Systray is not available", e);
 		}
 
 		return avail;
