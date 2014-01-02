@@ -1,10 +1,10 @@
 scotty transporter
-=======
+==================
 
-Copyright (c) 2013 Tobias Zeising (tobias.zeising@aditu.de), Florian Fuchs (flo@scotty-transporter.org) 
+Copyright (c) Tobias Zeising (tobias.zeising@aditu.de), Florian Fuchs (flo@scotty-transporter.org)
 http://www.scotty-transporter.org
+Licensed under the GPLv3 license
 Version 0.9.2
-Licensed under the GPLv3 license  
 
 
 Documentation & Support
