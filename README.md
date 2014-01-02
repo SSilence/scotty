@@ -1,40 +1,38 @@
 scotty transporter
+=======
+
+Copyright (c) 2013 Tobias Zeising (tobias.zeising@aditu.de), Florian Fuchs (flo@scotty-transporter.org) 
 http://www.scotty-transporter.org
 Version 0.9.2
-License: GPLv3
+Licensed under the GPLv3 license  
 
--------------
-Documentation
--------------
+
+Documentation & Support
+-----------------------
 
 The documentation can be found on http://www.scotty-transporter.org or here in the Wiki.
-
-
--------
-Support
--------
 
 Checkout our Support Forum: http://www.scotty-transporter.org/forum
 
 
----------
+
 CHANGELOG
 ---------
-
-Version 0.9
-* Initial Version with Standalone and Google Appengine Support
-
-Version 0.9.1
-* Bugfix: HTTPS works now correctly
-* Bugfix: Fix key loading Bug for Standalone Version
 
 Version 0.9.2
 * Improved PHP Gateway support
 * Improved PHP Gateway logging
 * Improve website documentation
 
+Version 0.9.1
+* Bugfix: HTTPS works now correctly
+* Bugfix: Fix key loading Bug for Standalone Version
 
--------
+Version 0.9
+* Initial Version with Standalone and Google Appengine Support
+
+
+
 CREDITS
 -------
 
